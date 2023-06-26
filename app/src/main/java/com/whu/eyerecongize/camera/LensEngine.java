@@ -24,11 +24,16 @@ import android.app.Activity;
 import android.content.res.Configuration;
 import android.graphics.ImageFormat;
 import android.hardware.Camera;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.util.Log;
+import android.widget.TextView;
 
 import androidx.annotation.RequiresPermission;
 
 import com.huawei.hms.common.size.Size;
+import com.whu.eyerecongize.R;
 import com.whu.eyerecongize.transactor.ImageTransactor;
 import com.whu.eyerecongize.views.overlay.GraphicOverlay;
 
@@ -59,6 +64,8 @@ public class LensEngine {
     private final Map<byte[], ByteBuffer> bytesToByteBuffer = new IdentityHashMap<>();
     private GraphicOverlay overlay;
 
+    private Handler handler;
+
 
     public LensEngine(Activity activity, CameraConfiguration configuration, GraphicOverlay graphicOverlay) {
         this.activity = activity;
@@ -66,6 +73,7 @@ public class LensEngine {
         this.selector = new CameraSelector(activity, configuration);
         this.overlay = graphicOverlay;
         this.overlay.clear();
+
     }
 
     /**

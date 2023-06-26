@@ -1,6 +1,15 @@
 package com.whu.eyerecongize.bilnk;
 
+import android.content.Context;
+import android.content.Intent;
+import android.os.Message;
+
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+
+import com.huawei.hms.mlsdk.face.MLFace;
+
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class Decode {
@@ -22,7 +31,7 @@ public class Decode {
 
 
     private static int CLOSED_COUNTER = 0;
-    private static int TOTAL = 0;
+    //private static int TOTAL = 0;
     private static  int OPEN_COUNTER = 0;
     private static int PARSED = 0;
     private static final int SPACED = 0;
@@ -35,7 +44,7 @@ public class Decode {
 
 
 
-    private static int get_with(String str){
+    private int get_with(String str){
         int result = 0;
         char[] string1 = str.toCharArray();
 
@@ -54,7 +63,7 @@ public class Decode {
     }
 
 
-    private static String shorten_code(String str){
+    private String shorten_code(String str){
         int result = 0;
         int i = 0;
         for (char c : str.toCharArray()) {
@@ -75,7 +84,7 @@ public class Decode {
     }
 
 
-    private static String parse_string(String str){
+    private String parse_string(String str){
         String result = "";
         if (!str.isEmpty()) {
             for (char ch : str.toCharArray()) {
@@ -90,8 +99,11 @@ public class Decode {
 
     }
 
-    public static String blinksDetectors(boolean blink) {
-        if (OUTPUT_MODE != 0) {
+    public void blinksDetectors(List<MLFace> faces, Context mt) {
+
+        boolean blink=BlinkCheck.checkBlink(faces);
+
+        if (OUTPUT_MODE != 0) {//时间过长进入锁定模式
             OUTPUT_DISP_TIME++;
             if (OUTPUT_DISP_TIME > OUTPUT_LAST_TIME) {
                 OUTPUT_DISP_TIME = 0;
@@ -100,10 +112,8 @@ public class Decode {
             }
         }
 
-        FRAME_COUNT++;
-        FRAME_COUNT = FRAME_COUNT % BLINK_FRE;
 
-        if (OPEN_COUNTER >= DIV_THRESH && STATUS == 1 && !output.isEmpty() && !output.endsWith(" ")) {
+        if (OPEN_COUNTER >= DIV_THRESH && STATUS == 1 && !output.isEmpty() && !output.endsWith(" ")) {//加一个空格,睁眼且大于间隔且现在没空格
             output = output + " ";
             System.out.println("输出空格");
         }
@@ -112,15 +122,14 @@ public class Decode {
             PARSED = 1;
             if (!current_code.isEmpty()) {
                 current_code += " ";
-                if (getWidth(current_code) > 15) {
-                    current_code = shortenCode(current_code);
+                if (get_with(current_code) > 15) {
+                    current_code = shorten_code(current_code);
                 }
             }
             Map<String, Object> userInfo = new HashMap<>();
             userInfo.put("current_code", current_code);
-            userInfo.put("former_code", parseString(former_code));
+            userInfo.put("former_code", parse_string(former_code));
             userInfo.put("decode", true);
-            notifyObserver(userInfo);
             former_code = "";
         }
 
@@ -137,7 +146,7 @@ public class Decode {
             if (OPEN_COUNTER >= EYE_OPEN_CONSEC_FRAMES) {
                 if (STATUS == 0) {
                     PARSED = 0;
-                    TOTAL++;
+                    //TOTAL++;
                     if (CLOSED_COUNTER < SHORT_THRESH) {
                         current_code = current_code + ".";
                         former_code = former_code + "0";
@@ -232,6 +241,20 @@ public class Decode {
             tmp.append("退出：...\n");
         }
 
-        return tmp.toString();
+
+        //return tmp.toString();
+
+        // 获取 LocalBroadcastManager 实例
+        LocalBroadcastManager broadcastManager = LocalBroadcastManager.getInstance(mt);
+
+        // 创建一个 Intent 对象，指定广播的 action
+        Intent intent = new Intent("code");
+
+        // 可选：添加额外的数据到 Intent 中
+        intent.putExtra("key", tmp.toString());
+
+        // 发送本地广播
+        broadcastManager.sendBroadcast(intent);
+
     }
 }

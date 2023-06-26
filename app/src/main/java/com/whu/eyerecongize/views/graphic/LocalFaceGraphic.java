@@ -296,7 +296,7 @@ public class LocalFaceGraphic extends BaseGraphic {
             List<MLPosition> leftpoints = leftEye.getPoints();
             List<MLPosition> rightpoints = rightEye.getPoints();
 
-            BlinkCheck.checkBlink(leftpoints,rightpoints);
+            //BlinkCheck.checkBlink(leftpoints,rightpoints);
 
             for (int i = 0; i < leftpoints.size(); i++) {
                 MLPosition point = leftpoints.get(i);

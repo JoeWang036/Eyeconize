@@ -1,15 +1,24 @@
 package com.whu.eyerecongize;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Color;
 import android.hardware.Camera;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.TextView;
 import android.widget.ToggleButton;
 
 import com.huawei.hms.mlsdk.face.MLFaceAnalyzerSetting;
@@ -33,6 +42,10 @@ public class testActivity extends AppCompatActivity implements View.OnClickListe
     private int facing = CameraConfiguration.CAMERA_FACING_FRONT;
     private Camera mCamera;
 
+    private TextView tet;
+
+    private BroadcastReceiver myReceiver;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,7 +56,7 @@ public class testActivity extends AppCompatActivity implements View.OnClickListe
         //初始化
         this.preview = this.findViewById(R.id.face_preview);
         this.graphicOverlay = this.findViewById(R.id.face_overlay);
-
+        this.tet=this.findViewById(R.id.textView);
 
 
         //相机配置对象
@@ -51,6 +64,21 @@ public class testActivity extends AppCompatActivity implements View.OnClickListe
         this.cameraConfiguration.setCameraFacing(this.facing);
         this.createLensEngine();
         this.setStatusBar();
+
+        myReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                String value = intent.getStringExtra("key");
+                tet.setText(value);
+            }
+        };
+
+        LocalBroadcastManager broadcastManager = LocalBroadcastManager.getInstance(this);
+
+
+        broadcastManager.registerReceiver(myReceiver, new IntentFilter("code"));
+
+
     }
 
 

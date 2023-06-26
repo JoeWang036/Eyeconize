@@ -29,6 +29,7 @@ import com.huawei.hms.mlsdk.common.MLFrame;
 import com.huawei.hms.mlsdk.face.MLFace;
 import com.huawei.hms.mlsdk.face.MLFaceAnalyzer;
 import com.huawei.hms.mlsdk.face.MLFaceAnalyzerSetting;
+import com.whu.eyerecongize.bilnk.Decode;
 import com.whu.eyerecongize.camera.FrameMetadata;
 import com.whu.eyerecongize.views.graphic.CameraImageGraphic;
 import com.whu.eyerecongize.views.graphic.LocalFaceGraphic;
@@ -46,12 +47,15 @@ public class LocalFaceTransactor extends BaseTransactor<List<MLFace>> {
     private Context mContext;
     private boolean isOpenDots;
 
+    private Decode decode;
+
     public LocalFaceTransactor(MLFaceAnalyzerSetting options, Context context) {
         super(context);
         this.detector = MLAnalyzerFactory.getInstance().getFaceAnalyzer(options);
         this.isOpenFeatures = isOpenFeatures;
         this.mContext = context;
         this.isOpenDots = isOpenDots;
+        this.decode=new Decode();
     }
 
     @Override
@@ -82,6 +86,9 @@ public class LocalFaceTransactor extends BaseTransactor<List<MLFace>> {
         }
         Log.d("toby", "Total HMSFaceProc hmsMLLocalFaceGraphic start");
         LocalFaceGraphic hmsMLLocalFaceGraphic = new LocalFaceGraphic(graphicOverlay, faces, mContext);
+
+        decode.blinksDetectors(faces,mContext);
+
         graphicOverlay.addGraphic(hmsMLLocalFaceGraphic);
         graphicOverlay.postInvalidate();
         Log.d("toby", "Total HMSFaceProc graphicOverlay end");

@@ -6,16 +6,26 @@ import android.util.Log;
 
 import com.huawei.hms.mlsdk.common.MLPosition;
 import com.huawei.hms.mlsdk.face.MLFace;
+import com.huawei.hms.mlsdk.face.MLFaceShape;
 
 import java.util.List;
 
 public class BlinkCheck {
 
-  public static boolean checkBlink(List<MLPosition> leftpoints, List<MLPosition> rightpoints){
+  public static boolean checkBlink(List<MLFace> faces){
 
 //    Log.d("distance0",leftpoints.get(0).toString());
 //    Log.d("distance7",leftpoints.get(7).toString());
+    if (faces == null || faces.size() == 0) {
+      return false;
+    }
+    MLFace face=faces.get(0);
 
+    MLFaceShape leftEye = face.getFaceShape(MLFaceShape.TYPE_LEFT_EYE);//左眼轮廓
+    MLFaceShape rightEye = face.getFaceShape(MLFaceShape.TYPE_RIGHT_EYE);//右眼轮廓
+    if(leftEye!=null&&rightEye!=null){
+    List<MLPosition> leftpoints = leftEye.getPoints();
+    List<MLPosition> rightpoints = rightEye.getPoints();
 
     double LV1= euclideanDistance(leftpoints.get(1),leftpoints.get(14));
     double LV2= euclideanDistance(leftpoints.get(2),leftpoints.get(13));
@@ -48,6 +58,7 @@ public class BlinkCheck {
     if(res<1200){
       Log.d("zhayan","zhayan");
       return true;
+    }
     }
     return false;
 
