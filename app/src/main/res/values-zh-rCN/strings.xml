@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">识目</string>
+
+    <string name="camera_permission_rationale">示例应用需要相机和存储权限</string>
+
+    <string name="ok">OK</string>
+    <string name="settings">设置</string>
+    <string name="cancel">取消</string>
+    <string name="take_photo">拍照</string>
+    <string name="select_from_album">从相册选择图片</string>
+    <string name="cloud_handkeypoint">手部关键点</string>
+    <string name="handRecognition">手势识别</string>
+    <string name="faceVerification">人脸比对</string>
+
+    <string name="click_add_template_picture">点击选择模板图片</string>
+    <string name="click_add_compare_picture">点击选择对比图片</string>
+    <string name="click_compare">对比</string>
+    <string name="please_select_picture">请选择一张图片</string>
+
+
+    <!--简写-->
+
+    <string name="face_detection">人脸检测</string>
+    <string name="face_3d">3D 人脸检测</string>
+    <string name="skeleton">人体骨骼</string>
+    <string name="liveness_detection">活体检测</string>
+    <string name="interactive_liveness_detection">动作活体检测</string>
+    <string name="handKeypoint">手部关键点</string>
+    <string name="gesture">手势识别</string>
+
+    <string name="detection_failed" translatable="false">验证失败</string>
+    <string name="failure_cause" translatable="false">失败原因</string>
+    <string name="retest" translatable="false">重新检测</string>
+    <string name="exit" translatable="false">退出</string>
+    <string name="start_detection" translatable="false">开始检测</string>
+
+    <string name="all">所有</string>
+    <string name="coming_soon">敬请期待</string>
+    <string name="back">返回</string>
+
+    <string name="more_face_data">人脸数据</string>
+    <string name="versions">版本号：</string>
+    <string name="start">启动默认UI</string>
+    <string name="custom_start">启动自定义UI</string>
+    <string name="custom_ui">人脸识别</string>
+    <string name="custom_tips">把脸放框里</string>
+
+    <string name="face_point">点</string>
+    <string name="face_feature">特征</string>
+    
+    <string name="gesture_one">数字1</string>
+    <string name="gesture_two">数字2</string>
+    <string name="gesture_three">数字3</string>
+    <string name="gesture_four">数字4</string>
+    <string name="gesture_five">数字5</string>
+    <string name="gesture_six">数字6</string>
+    <string name="gesture_seven">数字7</string>
+    <string name="gesture_eight">数字8</string>
+    <string name="gesture_nine">数字9</string>
+    <string name="gesture_diss">差评</string>
+    <string name="gesture_clench">握拳</string>
+    <string name="gesture_likes">点赞</string>
+    <string name="gesture_bx">单手比心</string>
+    <string name="gesture_confirm">确认</string>
+    <string name="gesture_others">其他手势</string>
+
+    <string name="interactive_in_progress">正在检测中</string>
+    <string name="interactive_spoofing">非活体</string>
+    <string name="interactive_live_and_action_correct">请进行下一动作检测</string>
+    <string name="interactive_guide_detection_success">引导检测成功</string>
+    <string name="interactive_no_face">无人脸，请对准人脸框</string>
+    <string name="interactive_part_face">人脸偏移中心，请对准人脸框</string>
+    <string name="interactive_big_face">人脸过大，请对准人脸框</string>
+    <string name="interactive_small_face">人脸过小，请对准人脸框</string>
+    <string name="interactive_wear_sunglasses">墨镜遮挡，请摘下墨镜检测</string>
+    <string name="interactive_wear_mask">口罩遮挡，请摘下口罩检测</string>
+    <string name="interactive_action_mutually_exclusive_error">动作检测互斥错误</string>
+    <string name="interactive_all_action_correct">人脸识别成功</string>
+    <string name="interactive_result_time_out">检测超时</string>
+    <string name="interactive_blur">请到光线明亮清晰处检测</string>
+    <string name="interactive_start">动作活体检测</string>
+
+</resources>
