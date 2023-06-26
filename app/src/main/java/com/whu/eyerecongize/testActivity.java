@@ -72,10 +72,7 @@ public class testActivity extends AppCompatActivity implements View.OnClickListe
                 tet.setText(value);
             }
         };
-
         LocalBroadcastManager broadcastManager = LocalBroadcastManager.getInstance(this);
-
-
         broadcastManager.registerReceiver(myReceiver, new IntentFilter("code"));
 
 

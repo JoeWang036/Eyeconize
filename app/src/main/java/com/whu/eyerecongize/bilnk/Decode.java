@@ -126,10 +126,14 @@ public class Decode {
                     current_code = shorten_code(current_code);
                 }
             }
-            Map<String, Object> userInfo = new HashMap<>();
-            userInfo.put("current_code", current_code);
-            userInfo.put("former_code", parse_string(former_code));
-            userInfo.put("decode", true);
+
+            LocalBroadcastManager broadcastManager = LocalBroadcastManager.getInstance(mt);
+            Intent intent = new Intent("code");
+            intent.putExtra("current_code", current_code);
+            intent.putExtra("former_code", parse_string(former_code));
+            intent.putExtra("decode", true);
+            broadcastManager.sendBroadcast(intent);
+
             former_code = "";
         }
 
@@ -166,10 +170,13 @@ public class Decode {
                             }
                         }
                     }
-                    Map<String, Object> userInfo = new HashMap<>();
-                    userInfo.put("current_code", current_code);
-                    userInfo.put("former_code", parse_string(former_code));
-                    userInfo.put("decode", false);
+
+                    LocalBroadcastManager broadcastManager = LocalBroadcastManager.getInstance(mt);
+                    Intent intent = new Intent("code");
+                    intent.putExtra("current_code", current_code);
+                    intent.putExtra("former_code", parse_string(former_code));
+                    intent.putExtra("decode", false);
+                    broadcastManager.sendBroadcast(intent);
                 }
                 STATUS = 1;
                 CLOSED_COUNTER = 0;
@@ -240,21 +247,6 @@ public class Decode {
             tmp.append("调低空调温度：--\n");
             tmp.append("退出：...\n");
         }
-
-
-        //return tmp.toString();
-
-        // 获取 LocalBroadcastManager 实例
-        LocalBroadcastManager broadcastManager = LocalBroadcastManager.getInstance(mt);
-
-        // 创建一个 Intent 对象，指定广播的 action
-        Intent intent = new Intent("code");
-
-        // 可选：添加额外的数据到 Intent 中
-        intent.putExtra("key", tmp.toString());
-
-        // 发送本地广播
-        broadcastManager.sendBroadcast(intent);
 
     }
 }
