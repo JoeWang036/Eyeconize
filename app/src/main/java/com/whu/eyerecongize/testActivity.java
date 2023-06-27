@@ -68,7 +68,7 @@ public class testActivity extends AppCompatActivity implements View.OnClickListe
         myReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                String value = intent.getStringExtra("key");
+                String value = intent.getStringExtra("current_code");
                 tet.setText(value);
             }
         };
