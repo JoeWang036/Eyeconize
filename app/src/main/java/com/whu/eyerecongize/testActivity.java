@@ -11,15 +11,10 @@ import android.graphics.Color;
 import android.hardware.Camera;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
-import android.os.Message;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.CompoundButton;
 import android.widget.TextView;
-import android.widget.ToggleButton;
 
 import com.huawei.hms.mlsdk.face.MLFaceAnalyzerSetting;
 import com.whu.eyerecongize.camera.CameraConfiguration;
@@ -56,7 +51,7 @@ public class testActivity extends AppCompatActivity implements View.OnClickListe
         //初始化
         this.preview = this.findViewById(R.id.face_preview);
         this.graphicOverlay = this.findViewById(R.id.face_overlay);
-        this.tet=this.findViewById(R.id.textView);
+        this.tet=this.findViewById(R.id.last_message);
 
 
         //相机配置对象
