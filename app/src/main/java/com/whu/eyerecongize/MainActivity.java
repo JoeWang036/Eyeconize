@@ -44,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void click(View view){
         Intent it=new Intent();
-        it.setClass(this, testActivity.class);
+        it.setClass(this, HomePage1.class);
         startActivity(it);
     }
 

@@ -46,6 +46,8 @@ public class testActivity extends AppCompatActivity implements View.OnClickListe
 
     private BroadcastReceiver myReceiver;
 
+    private LocalBroadcastManager broadcastManager;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,19 +67,24 @@ public class testActivity extends AppCompatActivity implements View.OnClickListe
         this.createLensEngine();
         this.setStatusBar();
 
-        myReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                String value = intent.getStringExtra("key");
-                tet.setText(value);
-            }
-        };
-        LocalBroadcastManager broadcastManager = LocalBroadcastManager.getInstance(this);
-        broadcastManager.registerReceiver(myReceiver, new IntentFilter("code"));
+
 
 
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        myReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                String value = intent.getStringExtra("current_code");
+                tet.setText(value);
+            }
+        };
+        broadcastManager = LocalBroadcastManager.getInstance(this);
+        broadcastManager.registerReceiver(myReceiver, new IntentFilter("code"));
+    }
 
     private void setStatusBar() {
         // SDK 21/Android 5.0.
@@ -161,6 +168,7 @@ public class testActivity extends AppCompatActivity implements View.OnClickListe
     protected void onStop() {
         super.onStop();
         this.preview.stop();
+        broadcastManager.unregisterReceiver(myReceiver);
     }
 
     @Override

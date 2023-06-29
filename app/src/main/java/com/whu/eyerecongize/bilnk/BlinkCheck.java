@@ -48,15 +48,31 @@ public class BlinkCheck {
     double RH2=euclideanDistance(rightpoints.get(15),rightpoints.get(8));
 
 
-    double Leye = (LV1+LV2+LV3+LV4+LV5+LV6)/3*(LH1+LH2);
-    double Reye=(RV1+RV2+RV3+RV4+RV5+RV6)/3*(RH1+RH2);
+//      System.out.println("LV1:"+LV1);
+//      System.out.println("LV2:"+LV2);
+//      System.out.println("LV3:"+LV3);
+//      System.out.println("LV4:"+LV4);
+//      System.out.println("LV5:"+LV5);
+//      System.out.println("LV6:"+LV6);
+//
+//      System.out.println("LH1:"+LH1);
+//      System.out.println("LH2:"+LH2);
 
-    double res=(Leye+Reye)/2;
+
+
+
+    double Leye =(LV1+LV2+LV3+LV4+LV5+LV6)/(3*(LH1+LH2));
+    double Reye=(RV1+RV2+RV3+RV4+RV5+RV6)/(3*(RH1+RH2));
+
+
+    double res=(Leye+Reye)/2*1000;
+
+    Log.d("juli",res+"");
 
     //Log.d("zhayan",res+"");
 
-    if(res<1200){
-      Log.d("zhayan","zhayan");
+    if(res<350){
+      //Log.d("zhayan","zhayan");
       return true;
     }
     }

@@ -7,4 +7,11 @@
     <declare-styleable name="MediumBold_TextView">
         <attr name="strokeWidth" format="dimension"/>
     </declare-styleable>
+
+    <declare-styleable name="BigButton">
+        <attr name="contentID" format="reference"/>
+        <attr name="codeID" format="reference"/>
+    </declare-styleable>
+
+
 </resources>

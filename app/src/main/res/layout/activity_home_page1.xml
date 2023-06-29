@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:eyecon="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#E5E5E5"
+    android:padding="0dp"
+    tools:context=".HomePage1">
+
+    <com.whu.eyerecongize.camera.LensEnginePreview
+        android:id="@+id/face_preview"
+        android:layout_width="211dp"
+        android:layout_height="209dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="40dp"
+        android:background="@color/black"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toEndOf="@+id/bigButton2"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.297">
+
+        <com.whu.eyerecongize.views.overlay.GraphicOverlay
+            android:id="@+id/face_overlay"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentBottom="true" />
+    </com.whu.eyerecongize.camera.LensEnginePreview>
+
+    <com.whu.eyerecongize.views.BigButton
+        android:id="@+id/bigButton5"
+        android:layout_width="144dp"
+        android:layout_height="86dp"
+        android:layout_marginStart="112dp"
+        android:layout_marginTop="76dp"
+        eyecon:contentID="@drawable/drink"
+        eyecon:layout_constraintStart_toStartOf="parent"
+        eyecon:layout_constraintTop_toTopOf="parent" />
+
+    <com.whu.eyerecongize.views.BigButton
+        android:id="@+id/bigButton6"
+        android:layout_width="144dp"
+        android:layout_height="86dp"
+        android:layout_marginStart="276dp"
+        android:layout_marginTop="76dp"
+        eyecon:contentID="@drawable/eat"
+        eyecon:layout_constraintStart_toStartOf="parent"
+        eyecon:layout_constraintTop_toTopOf="parent" />
+
+    <com.whu.eyerecongize.views.BigButton
+        android:id="@+id/bigButton4"
+        android:layout_width="144dp"
+        android:layout_height="86dp"
+        android:layout_marginStart="112dp"
+        android:layout_marginTop="176dp"
+        eyecon:contentID="@drawable/shit"
+        eyecon:layout_constraintStart_toStartOf="parent"
+        eyecon:layout_constraintTop_toTopOf="parent" />
+
+    <com.whu.eyerecongize.views.BarButton
+        android:id="@+id/barButton"
+        android:layout_width="96.6dp"
+        android:layout_height="147dp"
+        android:rotation="0"
+        android:rotationY="0"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintVertical_bias="0.0"
+        eyecon:contentID="@drawable/bar_use_active"
+        eyecon:layout_constraintStart_toStartOf="parent"
+        eyecon:layout_constraintTop_toTopOf="parent" />
+
+    <com.whu.eyerecongize.views.BarButton
+        android:id="@+id/barButton1"
+        android:layout_width="96.6dp"
+        android:layout_height="147dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintVertical_bias="0.992"
+        eyecon:contentID="@drawable/bar_other_deactivate"
+        eyecon:layout_constraintStart_toStartOf="parent"
+        eyecon:layout_constraintTop_toTopOf="parent" />
+
+    <com.whu.eyerecongize.views.BarButton
+        android:id="@+id/barButton2"
+        android:layout_width="96.6dp"
+        android:layout_height="147dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        eyecon:contentID="@drawable/bar_tool_deactivate"
+        eyecon:layout_constraintStart_toStartOf="parent"
+        eyecon:layout_constraintTop_toTopOf="parent" />
+
+    <com.whu.eyerecongize.views.BigButton
+        android:id="@+id/bigButton2"
+        android:layout_width="144dp"
+        android:layout_height="86dp"
+        android:layout_marginStart="276dp"
+        android:layout_marginTop="176dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        eyecon:contentID="@drawable/niao" />
+
+    <com.whu.eyerecongize.views.LongButton
+        android:id="@+id/longButton"
+        android:layout_width="437dp"
+        android:layout_height="60dp"
+        android:layout_marginStart="96dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.912"
+        eyecon:codeID="@drawable/help_code"
+        eyecon:contentID="@drawable/help" />
+
+    <ImageView
+        android:id="@+id/imageView2"
+        android:layout_width="194dp"
+        android:layout_height="44dp"
+        android:layout_marginStart="112dp"
+        android:layout_marginTop="16dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        eyecon:srcCompat="@drawable/block_button" />
+
+    <com.whu.eyerecongize.views.ImageEditText
+        android:id="@+id/imageEditText2"
+        android:layout_width="236dp"
+        android:layout_height="58dp"
+        android:layout_marginStart="448dp"
+        android:layout_marginBottom="40dp"
+        android:text="   "
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/face_preview"
+        app:layout_constraintVertical_bias="1.0" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -8,9 +8,11 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.huawei.hms.mlsdk.face.MLFace;
 
+import java.sql.Time;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Timer;
 
 public class Decode {
     private static String tmpText="";
@@ -18,29 +20,32 @@ public class Decode {
     private static String former_code = "";
     private static String output = "";
 
-    private static final double EYE_AR_THRESH = 0.2;
-    private static final int EYE_AR_CONSEC_FRAMES = 2;
-    private static final int EYE_OPEN_CONSEC_FRAMES = 2;
-    private static final int DIV_THRESH = 20;
 
-    private static final int SHORT_THRESH = 4;
-    private static final int LONG_THRESH = 15;
-    private static final int BLINK_FRE = 30;
-    private static final int WIDTH = 1080;
+    private static final int EYE_AR_CONSEC_FRAMES = 50;//闭眼门限
+    private static final int EYE_OPEN_CONSEC_FRAMES = 50;//睁眼门限
+    private static final int DIV_THRESH = 700;//空格门限
+
+    private static final int SHORT_THRESH =160;//短眨眼门限
+    private static final int LONG_THRESH = 500;//长眨眼门限
+
     private static final int OUTPUT_LAST_TIME = 100;
 
 
-    private static int CLOSED_COUNTER = 0;
-    //private static int TOTAL = 0;
-    private static  int OPEN_COUNTER = 0;
+
     private static int PARSED = 0;
     private static final int SPACED = 0;
     private static int STATUS = 0;
     private static final int INPUT_MODE = 0;
-    private static int FRAME_COUNT = 0;
+
     private static int OUTPUT_DISP_TIME = 0;
     private static int OUTPUT_MODE = 0;
-    private static final int CURRENT_TEMP = 24;
+
+
+    private boolean lastStatus;
+    private long lastTime=0;
+
+    private long totalOpenTime=0;
+    private long totalCloseTime=0;
 
 
 
@@ -57,6 +62,7 @@ public class Decode {
             }
             else{
                 result += 3;
+
             }
         }
         return result;
@@ -113,12 +119,12 @@ public class Decode {
         }
 
 
-        if (OPEN_COUNTER >= DIV_THRESH && STATUS == 1 && !output.isEmpty() && !output.endsWith(" ")) {//加一个空格,睁眼且大于间隔且现在没空格
+        if (totalOpenTime >= DIV_THRESH && STATUS == 1 && !output.isEmpty() && !output.endsWith(" ")) {//加一个空格,睁眼且大于间隔且现在没空格
             output = output + " ";
             System.out.println("输出空格");
         }
 
-        if (OPEN_COUNTER >= DIV_THRESH && PARSED == 0 && STATUS == 1) {
+        if (totalOpenTime >= DIV_THRESH && PARSED == 0 && STATUS == 1) {
             PARSED = 1;
             if (!current_code.isEmpty()) {
                 current_code += " ";
@@ -137,25 +143,61 @@ public class Decode {
             former_code = "";
         }
 
+        if(lastTime==0){
+            lastTime=System.currentTimeMillis();
+            lastStatus=blink;
+            return;
+        }
+
+        long nowTime=System.currentTimeMillis();
+        long timePass=0;
+
         if (blink) {
-            CLOSED_COUNTER++;
-            if (CLOSED_COUNTER >= EYE_AR_CONSEC_FRAMES) {//闭眼门槛
+
+            if(lastStatus!=blink){
+                timePass=(nowTime-lastTime)/2;
+                lastTime=nowTime;
+            }else{
+                timePass=nowTime-lastTime;
+                lastTime=nowTime;
+                //System.out.println("间隔时间"+timePass);
+            }
+
+            totalCloseTime+=timePass;
+            if(totalCloseTime>=EYE_AR_CONSEC_FRAMES){
                 if (STATUS == 1) {
                     STATUS = 0;
                 }
-                OPEN_COUNTER = 0;
+                totalOpenTime = 0;
             }
+//            CLOSED_COUNTER++;
+//            if (CLOSED_COUNTER >= EYE_AR_CONSEC_FRAMES) {//闭眼门槛
+//                if (STATUS == 1) {
+//                    STATUS = 0;
+//                }
+//                OPEN_COUNTER = 0;
+//            }
         } else {
-            OPEN_COUNTER++;
-            if (OPEN_COUNTER >= EYE_OPEN_CONSEC_FRAMES) {
+
+            if(lastStatus!=blink){
+                timePass=(nowTime-lastTime)/2;
+                lastTime=nowTime;
+            }else{
+                timePass=nowTime-lastTime;
+                lastTime=nowTime;
+                //System.out.println("间隔时间"+timePass);
+            }
+
+            totalOpenTime+=timePass;
+            if (totalOpenTime>= EYE_OPEN_CONSEC_FRAMES) {
                 if (STATUS == 0) {
                     PARSED = 0;
                     //TOTAL++;
-                    if (CLOSED_COUNTER < SHORT_THRESH) {
+                    if (totalCloseTime < SHORT_THRESH) {
                         current_code = current_code + ".";
                         former_code = former_code + "0";
                     } else {
-                        if (CLOSED_COUNTER < LONG_THRESH) {
+                        if (totalCloseTime < LONG_THRESH) {
                             current_code = current_code + "-";
                             former_code = former_code + "1";
                         } else {
@@ -179,9 +221,47 @@ public class Decode {
                     broadcastManager.sendBroadcast(intent);
                 }
                 STATUS = 1;
-                CLOSED_COUNTER = 0;
+                //System.out.println("闭眼时间："+totalCloseTime);
+                totalCloseTime = 0;
             }
         }
+
+//            OPEN_COUNTER++;
+//            if (OPEN_COUNTER >= EYE_OPEN_CONSEC_FRAMES) {
+//                if (STATUS == 0) {
+//                    PARSED = 0;
+//                    //TOTAL++;
+//                    if (CLOSED_COUNTER < SHORT_THRESH) {
+//                        current_code = current_code + ".";
+//                        former_code = former_code + "0";
+//                    } else {
+//                        if (CLOSED_COUNTER < LONG_THRESH) {
+//                            current_code = current_code + "-";
+//                            former_code = former_code + "1";
+//                        } else {
+//                            current_code += "+";
+//                            former_code = "";
+//                            if (INPUT_MODE == 1) {
+//                                if (output.length() > 1) {
+//                                    output = output.substring(0, output.length() - 1);
+//                                } else {
+//                                    output = "";
+//                                }
+//                            }
+//                        }
+//                    }
+//
+//                    LocalBroadcastManager broadcastManager = LocalBroadcastManager.getInstance(mt);
+//                    Intent intent = new Intent("code");
+//                    intent.putExtra("current_code", current_code);
+//                    intent.putExtra("former_code", parse_string(former_code));
+//                    intent.putExtra("decode", false);
+//                    broadcastManager.sendBroadcast(intent);
+//                }
+//                STATUS = 1;
+//                CLOSED_COUNTER = 0;
+//            }
+//        }
 
         StringBuilder tmp = new StringBuilder();
         tmp.append("current_code").append(current_code).append("\n");
