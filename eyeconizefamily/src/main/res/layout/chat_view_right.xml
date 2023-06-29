@@ -11,11 +11,11 @@
 
         android:layout_width="50dp"
         android:layout_height="50dp"
+        android:layout_marginEnd="10dp"
 
-        android:layout_marginStart="10dp"
         android:layout_marginTop="15dp"
         android:src="@drawable/ic_launcher_background"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:riv_corner_radius="25dp" />
 
@@ -23,18 +23,18 @@
         android:id="@+id/messageContent"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="5dp"
         android:layout_marginTop="20dp"
-        android:layout_marginBottom="10dp"
         android:layout_marginEnd="20dp"
-        android:background="@drawable/leftbubble"
-        android:text="sss"
+        android:layout_marginStart="20dp"
+        android:layout_marginBottom="10dp"
+        android:background="@drawable/rightbubble"
+        android:text="sssddd"
         android:textSize="15sp"
+        app:layout_constraintHorizontal_bias="1"
         app:layout_constrainedWidth="true"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0"
-        app:layout_constraintStart_toEndOf="@+id/chat_profile_pic"
+        app:layout_constraintEnd_toStartOf="@+id/chat_profile_pic"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/chat_profile_pic"
         app:layout_constraintWidth_max="wrap" />
 
