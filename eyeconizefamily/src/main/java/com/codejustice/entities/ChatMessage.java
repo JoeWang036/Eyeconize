@@ -5,7 +5,7 @@ import android.icu.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-public class ChatMessage {
+public class ChatMessage extends ChatMessageAbstract{
     public String messageContent;
     public long senderID;
     public long timestamp;  // 添加时间属性

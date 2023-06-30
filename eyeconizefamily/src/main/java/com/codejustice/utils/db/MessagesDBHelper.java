@@ -7,6 +7,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import com.codejustice.entities.ChatMessage;
+import com.codejustice.entities.ChatMessageAbstract;
+import com.codejustice.entities.TimeShowingMessage;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,7 +50,10 @@ public class MessagesDBHelper extends SQLiteOpenHelper {
 
     private void createNewTable(long hostID, long otherID) {
         SQLiteDatabase db = getWritableDatabase();
-        String createTableQuery = "CREATE TABLE IF NOT EXISTS " + genTableName(hostID, otherID) + " (id INTEGER, content text, sendTime INTEGER)";
+        String createTableQuery = "DROP TABLE IF EXISTS " + genTableName(hostID, otherID);
+        db.execSQL(createTableQuery);
+
+        createTableQuery = ("CREATE TABLE IF NOT EXISTS " + genTableName(hostID, otherID) + " (id INTEGER, content text, sendTime INTEGER)");
         db.execSQL(createTableQuery);
     }
 
@@ -82,19 +87,26 @@ public class MessagesDBHelper extends SQLiteOpenHelper {
     public Cursor getCursor(){
 
         String[] columns = {ID_KEY, CONTENT_KEY, TIME_KEY};
-        String orderBy = "sendTime DESC"; // 按照sendTime从大到小排序
+        String orderBy = "sendTime ASC"; // 按照sendTime从大到小排序
         return currentDatabase.query(currentTableName, columns, null, null, null, null, orderBy);
     }
-    public List<ChatMessage> getChatMessages(){
-        List<ChatMessage> result = new ArrayList<>();
+    public List<ChatMessageAbstract> getChatMessages(){
+        List<ChatMessageAbstract> result = new ArrayList<>();
         Cursor cursor = getCursor();
         if (cursor.moveToFirst()) {
             System.out.println("content detected.");
+            long lastSendTime = 0;
             do {
                 long senderID = cursor.getLong(cursor.getColumnIndexOrThrow(ID_KEY));
                 String message = cursor.getString(cursor.getColumnIndexOrThrow(CONTENT_KEY));
                 long sendTime = cursor.getLong(cursor.getColumnIndexOrThrow(TIME_KEY));
                 ChatMessage cm = new ChatMessage(message, senderID, sendTime);
+                System.out.println(sendTime);
+                if (sendTime - lastSendTime > 30000) {
+                    System.out.println("adding...");
+                    result.add(new TimeShowingMessage(sendTime));
+                }
+                lastSendTime = sendTime;
                 result.add(cm);
             } while (cursor.moveToNext());
         }else{

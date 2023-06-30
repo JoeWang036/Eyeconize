@@ -12,7 +12,7 @@ import androidx.fragment.app.FragmentTransaction;
 public class DualFragment extends Fragment {
 
     private FrameLayout familyPickerFragment;
-    private FrameLayout chatFragment;
+    public FrameLayout chatFragment;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -23,6 +23,9 @@ public class DualFragment extends Fragment {
 
         // 获取 ChatFragment 的 FrameLayout
         chatFragment = rootView.findViewById(R.id.chatFragment);
+        chatFragment.setOnClickListener(v -> {
+            System.out.println("DualFragment.chatFragment: Clicked.");
+        });
 
         return rootView;
     }
@@ -31,6 +34,7 @@ public class DualFragment extends Fragment {
 
     public void replaceFamilyPickerFragment(Fragment fragment) {
         FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
+
         transaction.replace(R.id.familyPickerFragment, fragment);
         transaction.commit();
     }
@@ -40,4 +44,5 @@ public class DualFragment extends Fragment {
         transaction.replace(R.id.chatFragment, fragment);
         transaction.commit();
     }
+
 }

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/navigation_main"
+        android:icon="@drawable/nav_main_icon"
+        android:title="监护"
+        />
+    <item android:icon="@drawable/nav_else_icon"
+        android:id="@+id/navigation_else"
+        android:title="更多"
+        />
+
+</menu>
