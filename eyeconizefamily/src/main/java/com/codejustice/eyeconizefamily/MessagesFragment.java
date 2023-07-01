@@ -29,18 +29,27 @@ import com.codejustice.utils.db.MessagesDBHelper;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MessagesFragment extends Fragment {
+import NetService.ConnectionUtils.ConnectionManager;
+import NetService.ConnectionUtils.MessageObserver;
+import NetService.MessageProtocol.TextMessage;
 
+public class MessagesFragment extends Fragment implements MessageObserver {
+
+    private boolean handlerEnabled = false;
 
 
     public static final int DUAL_MODE = 0;
     public static final int DETAILED_MODE = 1;
+    public static int num = 0;
     private int mode;
+    Handler handler;
 
     private ChatContentAdapter chatContentAdapter;
     private MessagesDBHelper messagesDbHelper;
     private RecyclerView chatView;
     private LinearLayoutManager layoutManager;
+
+    private ConnectionManager connectionManager;
     private List<ChatMessageAbstract> messages;
     private long lastClickedTime = 0;
     private long newestTime = 0;
@@ -55,10 +64,33 @@ public class MessagesFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // 使用 binding 来绑定布局文件
         binding = FragmentMessagesBinding.inflate(inflater, container, false);
+        connectionManager = ConnectionManager.getInstance();
+        connectionManager.registerMessageObserver(this);
+
         View rootView = binding.getRoot();
+        handler = new Handler(Looper.getMainLooper()){
+            @Override
+            public void handleMessage(Message msg) {
+                if (handlerEnabled) {
+                    switch (msg.what) {
+                        case MessageTypes.HANDLER_UPDATE_MESSAGE:
+                            ChatMessage cm = (ChatMessage) msg.obj;
+                            System.out.println("adding...");
+                            System.out.println(mode);
+                            addMessage(cm);
+                            break;
+                        case MessageTypes.HANDLER_DONE_INITIALIZATION:
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            }
+        };
 
         messagesDbHelper = new MessagesDBHelper(requireContext());
-        messagesDbHelper.switchTable(123456, 5);
+        messagesDbHelper.switchTable(123456, 2);
+
 
 
         // 初始化消息数据列表
@@ -87,6 +119,29 @@ public class MessagesFragment extends Fragment {
         return rootView;
     }
 
+    @Override
+    public void onPause() {
+
+        super.onPause();
+        connectionManager.unregisterMessageObserver(this);
+        handlerEnabled = false;
+    }
+    @Override
+    public void onResume(){
+        super.onResume();
+        handlerEnabled = true;
+        connectionManager.registerMessageObserver(this);
+
+    }
+    @Override
+    public void onDestroy(){
+        super.onDestroy();
+        connectionManager.unregisterMessageObserver(this);
+        handlerEnabled = false;
+
+    }
+
+
     public void addMessage(ChatMessage message) {
 
         if (message.timestamp - newestTime > 30000) {
@@ -100,6 +155,21 @@ public class MessagesFragment extends Fragment {
         chatContentAdapter.notifyItemInserted(position);
         chatView.scrollToPosition(position);
 
+    }
+
+
+    @Override
+    public void getMessage(TextMessage textMessage) {
+        ChatMessage chatMessage = new ChatMessage(textMessage.getMessage(), textMessage.getSenderID(), textMessage.getSendTime());
+        System.out.println("getting message...");
+
+        Message message = handler.obtainMessage(MessageTypes.HANDLER_UPDATE_MESSAGE, chatMessage);
+        handler.sendMessage(message);
+    }
+
+    @Override
+    public void messageFail(TextMessage textMessage) {
+        //TODO 增加消息发送失败的逻辑
     }
 
     class Cell extends RecyclerView.ViewHolder{
