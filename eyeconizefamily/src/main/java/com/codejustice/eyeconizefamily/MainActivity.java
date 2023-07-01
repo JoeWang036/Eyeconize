@@ -23,11 +23,16 @@ public class MainActivity extends AppCompatActivity {
     private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
+            System.out.println("received..");
             if (intent.getAction().equals(MessageTypes.ACTION_GO_TO_SEND_MESSAGES)) {
                 // 处理接收到的广播消息
                 Intent sendMessagesIntent = new Intent(MainActivity.this, SendMessageActivity.class);
                 startActivity(sendMessagesIntent);
                 finish();
+            } else if (intent.getAction().equals(MessageTypes.ACTION_GO_TO_PICK_PATIENTS)) {
+                System.out.println(intent.getAction());
+                Intent sendMessagesIntent = new Intent(MainActivity.this, PickPatientDetailedActivity.class);
+                startActivity(sendMessagesIntent);
             }
         }
     };
@@ -37,6 +42,8 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
         // 注册广播接收器
         IntentFilter intentFilter = new IntentFilter(MessageTypes.ACTION_GO_TO_SEND_MESSAGES);
+        registerReceiver(broadcastReceiver, intentFilter);
+        intentFilter = new IntentFilter(MessageTypes.ACTION_GO_TO_PICK_PATIENTS);
         registerReceiver(broadcastReceiver, intentFilter);
     }
 
@@ -83,7 +90,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart(){
         super.onStart();        // 替换 FamilyPickerFragment
-        PickPatientsFragment familyPickerFragment = new PickPatientsFragment();
+        PickPatientsFragment familyPickerFragment = new PickPatientsFragment(PickPatientsFragment.DUAL_MODE);
         dualFragment.replaceFamilyPickerFragment(familyPickerFragment);
         // 替换 ChatFragment
         MessagesFragment chatFragment = new MessagesFragment(MessagesFragment.DUAL_MODE);

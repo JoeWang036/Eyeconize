@@ -1,7 +1,9 @@
 package com.codejustice.eyeconizefamily;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,16 +16,28 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.codejustice.entities.FriendEntity;
+import com.codejustice.enums.MessageTypes;
 import com.codejustice.eyeconizefamily.databinding.FragmentPickPatientsBinding;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class PickPatientsFragment extends Fragment {
+
+    public static final int DUAL_MODE = 0;
+    public static final int DETAILED_MODE = 1;
+    private long lastClickedTime = 0;
+
+    private int mode;
+
     private RecyclerView familyPickerView;
     private FamilyPickerAdapter familyPickerAdapter;
     private List<FriendEntity> myFamilyList = new ArrayList<>();
     private FragmentPickPatientsBinding binding;
+
+    public PickPatientsFragment(int mode) {
+        this.mode = mode;
+    }
 
     // 在此处实现 onCreateView 方法
     @SuppressLint("NotifyDataSetChanged")
@@ -71,8 +85,30 @@ public class PickPatientsFragment extends Fragment {
         public FamilyCell onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
             View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.family_cell, parent, false);
             FamilyCell familyCell = new FamilyCell(view);
+
+            if (mode == DUAL_MODE) {
+                System.out.println("setting on click listener for pick.");
+                view.setOnClickListener(v->{
+                    if (lastClickedTime == 0) {
+                        lastClickedTime = SystemClock.uptimeMillis();
+                    }
+                    else{
+                        long nowClickedTime = SystemClock.uptimeMillis();
+                        long interval = nowClickedTime -lastClickedTime;
+                        if (interval < 200) {
+                            // 双击事件处理
+                            Intent intent = new Intent(MessageTypes.ACTION_GO_TO_PICK_PATIENTS);
+                            requireContext().sendBroadcast(intent);
+                            System.out.println("Broadcast sent.");
+                        }
+
+                        lastClickedTime = nowClickedTime;
+                    }
+                });
+            }
             return familyCell;
         }
+
 
 
         @Override
