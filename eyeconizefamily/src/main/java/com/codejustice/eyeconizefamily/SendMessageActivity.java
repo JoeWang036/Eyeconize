@@ -3,6 +3,8 @@ package com.codejustice.eyeconizefamily;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.MotionEvent;
@@ -16,7 +18,13 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.codejustice.entities.ChatMessage;
+import com.codejustice.enums.MessageTypes;
 import com.codejustice.global.Global;
+import com.codejustice.netservice.NetThread;
+
+import NetService.ConnectionUtils.ConnectionManager;
+import NetService.MessageProtocol.TextMessage;
+import NetService.MessageProtocol.TextMessageCoder;
 
 public class SendMessageActivity extends AppCompatActivity {
 
@@ -26,8 +34,10 @@ public class SendMessageActivity extends AppCompatActivity {
     private final float MIN_SWIPE_DISTANCE = 50;
     private final float HORIZONTAL_SWIPE_THRESH = 50;
 
+    private NetThread netThread;
 
     private MessagesFragment messagesFragment;
+    private ConnectionManager connectionManager;
     private Button sendButton;
     private EditText sendContent;
     public FrameLayout FamilyStatusHead;
@@ -41,7 +51,10 @@ public class SendMessageActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        netThread = ((EyeconizeFamilyApplication)getApplication()).getNetThread();
         setContentView(R.layout.activity_send_messages_detailed);
+        connectionManager = ConnectionManager.getInstance();
         messagesFragment = new MessagesFragment(MessagesFragment.DETAILED_MODE);
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.send_message_detailed_frame_layout, messagesFragment)
@@ -100,8 +113,11 @@ public class SendMessageActivity extends AppCompatActivity {
                           //正常点击
                             String message = sendContent.getText().toString();
                             if (!message.trim().equals("")) {
-                                ChatMessage chatMessage = new ChatMessage(message, Global.selfID, System.currentTimeMillis());
-                                messagesFragment.addMessage(chatMessage);
+                                System.out.println("connection manager id:");
+                                System.out.println(connectionManager.getSelfID());
+                                new Thread(()->{
+                                    connectionManager.sendTextMessage(message, 5);
+                                }).start();
                                 sendContent.setText("");
                             }
 
@@ -122,6 +138,12 @@ public class SendMessageActivity extends AppCompatActivity {
 
 
     }
+    @Override
+    public void onDestroy(){
+        super.onDestroy();
+        System.out.println("main view destroyed.");
+    }
+
 
     @Override
     protected void onStart(){

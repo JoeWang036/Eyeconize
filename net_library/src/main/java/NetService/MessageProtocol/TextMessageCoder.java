@@ -22,17 +22,20 @@ public class TextMessageCoder implements Coder {
     public void setSenderID(long senderID) {
         this.senderID = senderID;
     }
-
     @Override
     public TextMessage decode(byte[] byteArray){
+        if (byteArray.length < 17) {
+            return null;
+        }
         ByteBuffer bb = ByteBuffer.wrap(byteArray);
         byte type = bb.get();
         if (type == CodeTypeHeader.TEXT_MESSAGE) {
             long senderID = bb.getLong();
+            long sendTime = bb.getLong();
             byte[] dataBytes = new byte[bb.remaining()];
             bb.get(dataBytes);
             String data = new String(dataBytes);
-            return new TextMessage(data, senderID);
+            return new TextMessage(data, senderID, sendTime);
         }else return null;
 
     }
