@@ -23,9 +23,7 @@ public class DualFragment extends Fragment {
 
         // 获取 ChatFragment 的 FrameLayout
         chatFragment = rootView.findViewById(R.id.chatFragment);
-        chatFragment.setOnClickListener(v -> {
-            System.out.println("DualFragment.chatFragment: Clicked.");
-        });
+
 
         return rootView;
     }
