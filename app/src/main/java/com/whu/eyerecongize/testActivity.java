@@ -3,6 +3,7 @@ package com.whu.eyerecongize;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
+import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -14,6 +15,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.os.SystemClock;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -26,6 +28,8 @@ import com.whu.eyerecongize.camera.CameraConfiguration;
 import com.whu.eyerecongize.camera.LensEngine;
 import com.whu.eyerecongize.camera.LensEnginePreview;
 import com.whu.eyerecongize.transactor.LocalFaceTransactor;
+import com.whu.eyerecongize.views.MyDialog;
+import com.whu.eyerecongize.views.changeDialog;
 import com.whu.eyerecongize.views.overlay.GraphicOverlay;
 
 import java.io.IOException;
@@ -55,17 +59,17 @@ public class testActivity extends AppCompatActivity implements View.OnClickListe
         this.setContentView(R.layout.activity_test);
 
 
-        //初始化
-        this.preview = this.findViewById(R.id.face_preview);
-        this.graphicOverlay = this.findViewById(R.id.face_overlay);
-        this.tet=this.findViewById(R.id.textView);
-
-
-        //相机配置对象
-        this.cameraConfiguration = new CameraConfiguration();
-        this.cameraConfiguration.setCameraFacing(this.facing);
-        this.createLensEngine();
-        this.setStatusBar();
+//        //初始化
+//        this.preview = this.findViewById(R.id.face_preview);
+//        this.graphicOverlay = this.findViewById(R.id.face_overlay);
+//        this.tet=this.findViewById(R.id.textView);
+//
+//
+//        //相机配置对象
+//        this.cameraConfiguration = new CameraConfiguration();
+//        this.cameraConfiguration.setCameraFacing(this.facing);
+//        this.createLensEngine();
+//        this.setStatusBar();
 
 
 
@@ -117,9 +121,23 @@ public class testActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     @Override
-    public void onClick(View view) {//点击返回按钮释放引擎
-            releaseLensEngine();
-            this.finish();
+    public void onClick(View view) {
+        //点击返回按钮释放引擎
+        changeDialog mdialog =new changeDialog(this,R.style.MyDialogStyle,true);
+        mdialog.show();
+        SystemClock.sleep(1000);
+        mdialog.changeStatus(true);
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (mdialog.isShowing()) {
+                    mdialog.dismiss();
+                }
+            }
+        }, 3000); // 延时3秒关闭弹窗
+//            releaseLensEngine();
+//            this.finish();
     }
 
 

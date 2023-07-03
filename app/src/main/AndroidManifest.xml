@@ -24,12 +24,24 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
-            android:name=".HomePage1"
+            android:name=".getMessage"
             android:exported="false" />
+        <activity
+            android:name=".HomePage3"
+            android:exported="false"
+            android:screenOrientation="landscape" />
+        <activity
+            android:name=".HomePage2"
+            android:exported="false"
+            android:screenOrientation="landscape" />
+        <activity
+            android:name=".HomePage1"
+            android:exported="false"
+            android:screenOrientation="landscape" />
         <activity
             android:name=".testActivity"
             android:exported="false"
-            android:screenOrientation="landscape"/>
+            android:screenOrientation="landscape" />
         <activity
             android:name=".MainActivity"
             android:exported="true"

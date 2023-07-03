@@ -21,6 +21,9 @@ public class BarButton extends View {
     private Bitmap content;
     private Bitmap rect;
 
+    private Bitmap save;
+
+    private Bitmap select;
     private Paint paint;
 
     float hei;
@@ -28,12 +31,19 @@ public class BarButton extends View {
 
     Drawable drawable;
 
+    Drawable selectDrawable;
+
+
+
+
+
     public BarButton(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         TypedArray tp= context.obtainStyledAttributes(attrs, R.styleable.BigButton);
         for(int i=0;i<tp.getIndexCount();i++){
             int index=tp.getIndex(i);
             if(index==R.styleable.BigButton_contentID) drawable=tp.getDrawable(index);
+            if(index==R.styleable.BigButton_selectID) selectDrawable=tp.getDrawable(index);
         }
         initview(drawable);
     }
@@ -42,9 +52,23 @@ public class BarButton extends View {
         BitmapDrawable bitmapDrawable=(BitmapDrawable)drawable;
         content = bitmapDrawable.getBitmap();
         rect= BitmapFactory.decodeResource(getResources(),R.drawable.white_bar_button);
+        bitmapDrawable=(BitmapDrawable)selectDrawable;
+        select=bitmapDrawable.getBitmap();
         paint=new Paint();
         paint.setAntiAlias(true);
 
+    }
+
+    public void setRec(boolean status){//用于触发按钮时切换背景
+        if(status){
+            rect=BitmapFactory.decodeResource(getResources(),R.drawable.green_bar_button);
+            save=content;
+            content=select;
+        }else{
+            rect=BitmapFactory.decodeResource(getResources(),R.drawable.white_bar_button);
+            select=content;
+            content=save;
+        }
     }
 
     @Override

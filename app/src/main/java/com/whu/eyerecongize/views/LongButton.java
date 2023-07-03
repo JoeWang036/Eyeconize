@@ -32,6 +32,8 @@ public class LongButton extends View {
 
     Drawable drawable;
     Drawable code;
+
+    String text;
     public LongButton(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         TypedArray tp = context.obtainStyledAttributes(attrs, R.styleable.BigButton);
@@ -39,8 +41,14 @@ public class LongButton extends View {
             int index=tp.getIndex(i);
             if(index==R.styleable.BigButton_contentID) drawable=tp.getDrawable(index);
             if(index==R.styleable.BigButton_codeID) code=tp.getDrawable(index);
+            if(index==R.styleable.BigButton_text)text=tp.getString(index);
         }
+
+        int contentID = tp.getResourceId(R.styleable.BigButton_contentID, 0);
+
+        tp.recycle();
         initview(drawable,code);
+        setText(contentID);
     }
 
     private void initview(Drawable drawable,Drawable code) {
@@ -53,6 +61,30 @@ public class LongButton extends View {
         paint.setAntiAlias(true);
         customTypeface = Typeface.createFromAsset(getContext().getAssets(), "fonts/W7-P.ttf");
 
+    }
+
+    public void setRec(boolean status){//用于触发按钮时切换背景
+        if(status){
+            rect=BitmapFactory.decodeResource(getResources(),R.drawable.green_long_button);
+        }else{
+            rect=BitmapFactory.decodeResource(getResources(),R.drawable.white_long_button);
+        }
+    }
+
+    private void setText(int contentID){
+        if(contentID==R.drawable.help){
+            paint.setTextSize(75);
+        }else{
+            paint.setTextSize(55);
+        }
+    }
+
+    public void setIcon(Integer iconID) {
+        icon = BitmapFactory.decodeResource(getResources(), iconID);
+    }
+
+    public void setTextContent(String con){
+        this.text=con;
     }
 
     @Override
@@ -85,12 +117,13 @@ public class LongButton extends View {
         canvas.drawBitmap(icon, matrixIcon, paint);
         canvas.drawBitmap(rect, matrixRec, paint);
 
+
+        if(text.equals("")){
+            return;
+        }
+
         // 设置画笔字体和字号
         paint.setTypeface(customTypeface);
-        paint.setTextSize(75);
-
-
-        String text = "求救"; // 要绘制的字符串
 
         float textWidth = paint.measureText(text); // 字符串的宽度
 

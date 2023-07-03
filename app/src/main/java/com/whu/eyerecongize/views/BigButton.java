@@ -49,6 +49,16 @@ public class BigButton extends View {
 
     }
 
+
+
+    public void setRec(boolean status){//用于触发按钮时切换背景
+        if(status){
+            rect=BitmapFactory.decodeResource(getResources(),R.drawable.green_big_button);
+        }else{
+            rect=BitmapFactory.decodeResource(getResources(),R.drawable.baianniu);
+        }
+    }
+
     @Override
     protected void onDraw(Canvas canvas){
 

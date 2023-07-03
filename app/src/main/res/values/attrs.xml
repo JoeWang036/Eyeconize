@@ -11,6 +11,9 @@
     <declare-styleable name="BigButton">
         <attr name="contentID" format="reference"/>
         <attr name="codeID" format="reference"/>
+        <attr name="text" format="string"/>
+        <attr name="barStatus" format="integer"/>
+        <attr name="selectID" format="reference"/>
     </declare-styleable>
 
 
