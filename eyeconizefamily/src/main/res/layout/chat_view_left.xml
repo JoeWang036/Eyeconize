@@ -27,7 +27,7 @@
         android:layout_marginTop="20dp"
         android:layout_marginBottom="10dp"
         android:layout_marginEnd="20dp"
-        android:background="@drawable/leftbubble"
+        android:background="@drawable/chat_bubble_left"
         android:text="sss"
         android:textSize="15sp"
         app:layout_constrainedWidth="true"

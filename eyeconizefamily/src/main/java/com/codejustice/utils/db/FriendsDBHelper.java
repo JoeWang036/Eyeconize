@@ -25,10 +25,29 @@ public class FriendsDBHelper extends SQLiteOpenHelper {
     private String currentTableName;
     private SQLiteDatabase currentDatabase;
 
+    private static FriendsDBHelper instance;
 
-    public FriendsDBHelper(Context context) {
+
+    public static FriendsDBHelper getInstance(Context context) {
+        synchronized (FriendsDBHelper.class) {
+            if (instance == null) {
+                instance = new FriendsDBHelper(context);
+            }
+            return instance;
+        }
+    }
+
+    public static void instantiate(Context context) {
+        instance = new FriendsDBHelper(context);
+    }
+    private FriendsDBHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
         currentTableName = "default_table";
+
+    }
+    private FriendsDBHelper(Context context, long userID) {
+        super(context, DATABASE_NAME, null, DATABASE_VERSION);
+        currentTableName = genTableName(userID);
 
     }
 
@@ -80,6 +99,19 @@ public class FriendsDBHelper extends SQLiteOpenHelper {
         values.put(LAST_CHANGE_KEY, friend.lastChangeProfileTime);
         currentDatabase.insert(currentTableName, null, values);
 
+    }
+
+    public String getFriendNicknameByID(long friendID, long userID) {
+        String nickname = null;
+        currentDatabase = getWritableDatabase();
+        Cursor cursor = currentDatabase.query(genTableName(userID), new String[]{NICKNAME_KEY},
+                ID_KEY + "=?", new String[]{String.valueOf(friendID)},
+                null, null, null);
+        if (cursor != null && cursor.moveToFirst()) {
+            nickname = cursor.getString(cursor.getColumnIndexOrThrow(NICKNAME_KEY));
+            cursor.close();
+        }
+        return nickname;
     }
 
     public void switchTable(long userID) {

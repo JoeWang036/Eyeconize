@@ -10,6 +10,7 @@ import java.util.List;
 
 import NetService.MessageProtocol.CodeTypeHeader;
 import NetService.MessageProtocol.CommunicationMessage;
+import NetService.MessageProtocol.ConfirmMessage;
 import NetService.MessageProtocol.ConnectionRequestCoder;
 import NetService.MessageProtocol.ConnectionRequestMessage;
 import NetService.MessageProtocol.HeaderMessageCoder;
@@ -23,6 +24,7 @@ public class ConnectionManager {
     public String password;
     private Socket socket;
     private long selfID;
+    private short sendSerial;
     private static ConnectionManager instance;
     private TransmissionManager transmissionManager;
     private ConnectionRequestCoder connectionRequestCoder;
@@ -82,6 +84,7 @@ public class ConnectionManager {
         connectionRequestCoder = new ConnectionRequestCoder();
         textMessageCoder = new TextMessageCoder(userID);
         selfID = userID;
+        sendSerial = 1;
         this.password = password;
 
     }
@@ -116,10 +119,17 @@ public class ConnectionManager {
             observer.getMessage(textMessage);
         }
     }
-    private void notifyMessageObserversFail(TextMessage textMessage){
+
+    public void notifyMessageObserverRefresh(ConfirmMessage confirmMessage) {
         for (MessageObserver observer :
                 messageObservers) {
-            observer.messageFail(textMessage);
+            observer.updateSentStatus(confirmMessage);
+        }
+    }
+    private void notifyMessageObserversFail(long receiverID, long sendTime, short messageSerial ){
+        for (MessageObserver observer :
+                messageObservers) {
+            observer.messageFail(receiverID, sendTime, messageSerial);
         }
     }
     private void tryToConnect(){
@@ -193,27 +203,52 @@ public class ConnectionManager {
     }
 
     //TODO: 后续需要修改交互逻辑，需要服务器返回确认信息才发送成功
-    public boolean sendTextMessage(String textMessage, long receiverID) {
+    public short sendTextMessage(String textMessage, long receiverID, short sendSerial, long sendTime) {
 
 
-        byte[] data = textMessageCoder.encode(textMessage, receiverID);
+        byte[] data = textMessageCoder.encode(textMessage,sendSerial, receiverID);
         if (!connected) {
             System.out.println("Connection manager 176: trying to connect.");
+            tryToConnect();
+        }
+        try {
+            transmissionManager.sendMessage(data, socket);
+            return sendSerial;
+        } catch (IOException e) {
+            setConnected(false);
+            tryToConnect();
+
+            notifyMessageObserversFail(receiverID, sendTime, sendSerial);
+            return -1;
+        } catch (NullPointerException e) {
+            System.out.println("Socket is currently null, please try later.");
+            notifyMessageObserversFail(receiverID, sendTime, sendSerial);
+            return -1;
+        }
+    }
+    public short sendQuestionMessage(String textMessage, long receiverID, short sendSerial) {
+
+
+        sendSerial += 1;
+        sendSerial = (short) (sendSerial%(short) 50000);
+        byte[] data = textMessageCoder.encode(CodeTypeHeader.SIMPLE_QUESTION_MESSAGE, textMessage,sendSerial, receiverID);
+        if (!connected) {
+            System.out.println("Connection manager 228: trying to connect.");
             tryToConnect();
         }
         try {
 
             transmissionManager.sendMessage(data, socket);
 
-            return true;
+            return sendSerial;
         } catch (IOException e) {
             setConnected(false);
             tryToConnect();
 
-            return false;
+            return -1;
         } catch (NullPointerException e) {
             System.out.println("Socket is currently null, please try later.");
-            return false;
+            return -1;
         }
     }
     public CommunicationMessage readMessage(){
@@ -226,11 +261,17 @@ public class ConnectionManager {
 
                 byte type = headerMessageCoder.determineType(res);
                 switch (type) {
+                    case CodeTypeHeader.SIMPLE_QUESTION_MESSAGE:
                     case CodeTypeHeader.TEXT_MESSAGE:
                         TextMessage textMessage = textMessageCoder.decode(res);
                         System.out.println("Getting message from:" + textMessage.getSenderID());
                         System.out.println("CommunicationMessage content:" + textMessage.getMessage());
                         return textMessage;
+                    case CodeTypeHeader.CONFIRM_MESSAGE:
+                        ConfirmMessage confirmMessage = ConfirmMessage.decode(res);
+                        System.out.println("confirmation message detected.");
+                        return confirmMessage;
+
                     default:
                         return null;
                 }
