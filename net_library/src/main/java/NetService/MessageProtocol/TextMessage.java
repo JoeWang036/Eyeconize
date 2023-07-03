@@ -3,12 +3,19 @@ package NetService.MessageProtocol;
 
 public class TextMessage extends CommunicationMessage{
     private String message;
+    private short messageSerial;
     private long senderID;
+
     private long sendTime;
-    public TextMessage(String message, long senderID, long sendTime) {
+    public TextMessage(String message, short messageSerial, long senderID,long sendTime) {
         this.message = message;
+        this.messageSerial = messageSerial;
         this.senderID = senderID;
         this.sendTime = sendTime;
+    }
+
+    public short getMessageSerial() {
+        return messageSerial;
     }
 
     public String getMessage() {
@@ -26,7 +33,6 @@ public class TextMessage extends CommunicationMessage{
     public long getSendTime() {
         return sendTime;
     }
-
     public void setSenderID(long senderID) {
         this.senderID = senderID;
     }
@@ -36,7 +42,7 @@ public class TextMessage extends CommunicationMessage{
         if (!(other instanceof TextMessage)) {
             return false;
         }else {
-            return (this.message.equals(((TextMessage) other).message) && this.senderID == ((TextMessage) other).getSenderID() && this.sendTime == ((TextMessage) other).getSendTime());
+            return (this.senderID == ((TextMessage) other).getSenderID() && this.messageSerial == (((TextMessage) other).messageSerial) && this.sendTime == ((TextMessage) other).getSendTime());
         }
     }
 }

@@ -40,6 +40,7 @@ public class SendMessageActivity extends AppCompatActivity {
     private ConnectionManager connectionManager;
     private Button sendButton;
     private EditText sendContent;
+    private short messageSerial = 1;
     public FrameLayout FamilyStatusHead;
     private ImageButton goToMainButton;
     private TextView batteryView;
@@ -115,8 +116,13 @@ public class SendMessageActivity extends AppCompatActivity {
                             if (!message.trim().equals("")) {
                                 System.out.println("connection manager id:");
                                 System.out.println(connectionManager.getSelfID());
+                                messageSerial++;
+                                messageSerial = (short)(messageSerial%50000);
+                                long sendTime = System.currentTimeMillis();
+                                messagesFragment.addMessage(new ChatMessage(message, Global.selfID, sendTime, messageSerial, ChatMessage.SENDING));
+
                                 new Thread(()->{
-                                    connectionManager.sendTextMessage(message, 5);
+                                    connectionManager.sendTextMessage(message, Global.receiverID, messageSerial, sendTime);
                                 }).start();
                                 sendContent.setText("");
                             }

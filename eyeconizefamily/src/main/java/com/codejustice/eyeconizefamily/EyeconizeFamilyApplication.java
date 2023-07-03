@@ -4,6 +4,8 @@ import android.app.Application;
 import android.os.Handler;
 
 import com.codejustice.netservice.NetThread;
+import com.codejustice.utils.db.FriendsDBHelper;
+import com.codejustice.utils.db.MessagesDBHelper;
 
 public class EyeconizeFamilyApplication extends Application {
 
@@ -13,7 +15,8 @@ public class EyeconizeFamilyApplication extends Application {
     public void onCreate() {
         super.onCreate();
         startNetThread();
-
+        FriendsDBHelper.instantiate(this);
+        MessagesDBHelper.instantiate(this);
     }
 
     @Override
@@ -23,7 +26,11 @@ public class EyeconizeFamilyApplication extends Application {
     }
 
     private void startNetThread() {
+
+        FriendsDBHelper.instantiate(this);
+        MessagesDBHelper.instantiate(this);
         netThread = NetThread.getInstance();
+        netThread.setMessagesDBHelper(MessagesDBHelper.getInstance(this));
         netThread.startThread();
 
     }

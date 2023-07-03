@@ -6,19 +6,25 @@ import android.os.Message;
 
 import com.codejustice.enums.MessageTypes;
 import com.codejustice.global.Global;
+import com.codejustice.utils.db.MessagesDBHelper;
 
 import java.util.Spliterator;
 
 import NetService.ConnectionUtils.ConnectionManager;
 import NetService.ConnectionUtils.ConnectionObserver;
 import NetService.MessageProtocol.CommunicationMessage;
+import NetService.MessageProtocol.ConfirmMessage;
 import NetService.MessageProtocol.TextMessage;
 
 public class NetThread extends HandlerThread implements ConnectionObserver {
     private Handler handler;
+    private MessagesDBHelper messagesDBHelper;
     private static NetThread instance;
     private ConnectionManager connectionManager;
 
+    public void setMessagesDBHelper(MessagesDBHelper messagesDBHelper) {
+        this.messagesDBHelper = messagesDBHelper;
+    }
 
     private NetThread(String name) {
         super(name);
@@ -39,6 +45,7 @@ public class NetThread extends HandlerThread implements ConnectionObserver {
         System.out.println("connection manager id:");
         System.out.println(connectionManager.getSelfID());
         while (true) {
+
             synchronized (connectionManager) {
                 while (!connectionManager.isConnected()) {
                     try {
@@ -59,6 +66,10 @@ public class NetThread extends HandlerThread implements ConnectionObserver {
                 Message msg = handler.obtainMessage(MessageTypes.HANDLER_UPDATE_MESSAGE);
                 msg.obj = message;
                 handler.sendMessage(msg);
+            } else if (message instanceof ConfirmMessage) {
+                messagesDBHelper.updateSentStatus((ConfirmMessage) message);
+                connectionManager.notifyMessageObserverRefresh((ConfirmMessage) message);
+
             }
         }
     }
@@ -73,9 +84,9 @@ public class NetThread extends HandlerThread implements ConnectionObserver {
                 System.out.println("got message.");
                 switch (msg.what) {
                     case MessageTypes.HANDLER_REQUEST_SEND_MESSAGE:
-                        System.out.println("handling...");
-                        String content = (String) msg.obj;
-                        connectionManager.sendTextMessage(content, 5);
+//                        System.out.println("handling...");
+//                        String content = (String) msg.obj;
+//                        connectionManager.sendTextMessage(content, Global.receiverID, (short) 1);
                         break;
 
                     case MessageTypes.HANDLER_UPDATE_MESSAGE:
