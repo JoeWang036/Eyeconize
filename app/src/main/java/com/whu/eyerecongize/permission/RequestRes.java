@@ -25,6 +25,7 @@ public class RequestRes {
             }
             //已全部授权
             if (isAllGranted) {
+
                 return true;
             }
             else {

@@ -17,6 +17,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 
+import com.whu.eyerecongize.permission.CheckPermit;
 import com.whu.eyerecongize.permission.Permissions;
 import com.whu.eyerecongize.permission.RequestPermit;
 import com.whu.eyerecongize.permission.RequestRes;
@@ -34,6 +35,8 @@ public class MainActivity extends AppCompatActivity {
     private static final long DELAY_TIME = 1200; // 延迟时间，单位为毫秒
 
     private Handler handler;
+
+    String[] permissions;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,18 +44,23 @@ public class MainActivity extends AppCompatActivity {
         //申请权限
         requestPermissions = RequestPermit.getInstance();//动态权限请求
         requestPermissionsResult = RequestRes.getInstance();//动态权限请求结果处理
-        requestPermissions.requestPermissions(this, Permissions.permissions,100);
+        permissions=Permissions.getRequiredPermissions(this);
+        requestPermissions.requestPermissions(this, permissions,100);
+        boolean premissionRes=CheckPermit.checkPermissionAllGranted(this,permissions);
         setStatusBar();
-        handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                // 跳转到目标页面
-                Intent intent = new Intent(MainActivity.this, HomePage1.class);
-                startActivity(intent);
-                finish(); // 结束当前页面
-            }
-        }, DELAY_TIME);
+        System.out.println(premissionRes);
+        if(premissionRes){
+            handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    // 跳转到目标页面
+                    Intent intent = new Intent(MainActivity.this, HomePage1.class);
+                    startActivity(intent);
+                    finish(); // 结束当前页面
+                }
+            }, DELAY_TIME);
+        }
     }
 
     private void setStatusBar() {
@@ -71,6 +79,17 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == 100) {
+            if (CheckPermit.checkPermissionAllGranted(this,permissions)) {
+                Intent intent = new Intent(MainActivity.this, HomePage1.class);
+                startActivity(intent);
+                finish(); // 结束当前页面
+
+            } else if(grantResults.length != 0 && grantResults[0] == PackageManager.PERMISSION_DENIED){
+                System.out.println("111");
+                finish();
+            }
+        }
     }
 
     protected void onDestroy() {
