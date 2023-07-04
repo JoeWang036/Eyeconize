@@ -45,6 +45,13 @@ public class MainActivity extends AppCompatActivity implements PageObserver, Rep
                 System.out.println(intent.getAction());
                 Intent sendMessagesIntent = new Intent(MainActivity.this, PickPatientDetailedActivity.class);
                 startActivity(sendMessagesIntent);
+            } else if (intent.getAction().equals(MessageTypes.ACTION_ALTER_CHAT_CONTENTS)) {
+                System.out.println("received broadcast: alter chat content. former id:"+ Global.receiverID);
+                long newID = intent.getLongExtra(MessageTypes.INTENT_EXTRA_NEW_USER_ID, Global.receiverID);
+                System.out.println("new ID: "+newID);
+                Global.receiverID = newID;
+                messagesFragment.refreshDatabase(newID);
+
             }
         }
     };
@@ -56,6 +63,8 @@ public class MainActivity extends AppCompatActivity implements PageObserver, Rep
         IntentFilter intentFilter = new IntentFilter(MessageTypes.ACTION_GO_TO_SEND_MESSAGES);
         registerReceiver(broadcastReceiver, intentFilter);
         intentFilter = new IntentFilter(MessageTypes.ACTION_GO_TO_PICK_PATIENTS);
+        registerReceiver(broadcastReceiver, intentFilter);
+        intentFilter = new IntentFilter(MessageTypes.ACTION_ALTER_CHAT_CONTENTS);
         registerReceiver(broadcastReceiver, intentFilter);
         connectionManager.registerPageObserver(this);
         if (Global.SEND_NEW_MESSAGE) {

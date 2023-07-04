@@ -8,7 +8,9 @@ public class MessageTypes {
     public static final int HANDLER_UPDATE_RECYCLER = 5;
     public static final int HANDLER_MESSAGE_FAIL = 6;
     public static final int GO_TO_SEND_MESSAGES = 0;
+    public static final String INTENT_EXTRA_NEW_USER_ID = "new_user_id";
     public static final String ACTION_GO_TO_SEND_MESSAGES = "com.codeJustice.GO_TO_SEND_MESSAGES";
+    public static final String ACTION_ALTER_CHAT_CONTENTS = "com.codeJustice.ACTION_ALTER_CHAT_CONTENTS";
     public static final String ACTION_GO_TO_PICK_PATIENTS = "com.codeJustice.GO_TO_PICK_PATIENTS";
     public static final String NEW_MESSAGE_RECEIVED = "com.codeJustice.NEW_MESSAGE_RECEIVED";
 }

@@ -29,9 +29,10 @@ public class FriendEntity {
     public FriendEntity() {
     }
 
-    public FriendEntity(String friendName, String lastMessage) {
+    public FriendEntity(String friendName, String lastMessage, long friendID) {
         this.friendName = friendName;
         this.lastMessage = lastMessage;
+        this.friendID = friendID;
     }
 
 }

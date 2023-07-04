@@ -140,6 +140,15 @@ public class MessagesFragment extends Fragment implements MessageObserver {
         chatContentAdapter.notifyDataSetChanged();
         chatView.scrollToPosition(position);
     }
+
+
+    public void refreshDatabase(long newID) {
+        messagesDbHelper.switchTable(Global.selfID, newID);
+        refreshContent();
+
+
+    }
+
     private void refreshContent(){
         messages = messagesDbHelper.getChatMessages();
         int position = messages.size() - 1;

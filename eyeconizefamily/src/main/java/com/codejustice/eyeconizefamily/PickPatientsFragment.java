@@ -3,6 +3,7 @@ package com.codejustice.eyeconizefamily;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Message;
 import android.os.SystemClock;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -55,7 +56,7 @@ public class PickPatientsFragment extends Fragment {
 
         // 添加测试数据
         for (int i = 0; i < 20; i++) {
-            FriendEntity fm = new FriendEntity("家人" + i, "我需要钱");
+            FriendEntity fm = new FriendEntity("家人" + i, "我需要钱", i);
             myFamilyList.add(fm);
         }
         familyPickerAdapter.notifyDataSetChanged();
@@ -68,9 +69,11 @@ public class PickPatientsFragment extends Fragment {
         ImageView profilePic;
         TextView name;
         TextView lastMessage;
+        View view;
 
         public FamilyCell(@NonNull View itemView) {
             super(itemView);
+            view = itemView;
             name = itemView.findViewById(R.id.family_name);
             lastMessage = itemView.findViewById(R.id.last_message);
             profilePic = itemView.findViewById(R.id.chat_profile_pic);
@@ -95,6 +98,9 @@ public class PickPatientsFragment extends Fragment {
                     else{
                         long nowClickedTime = SystemClock.uptimeMillis();
                         long interval = nowClickedTime -lastClickedTime;
+                        Intent newIntent = new Intent(MessageTypes.ACTION_ALTER_CHAT_CONTENTS);
+                        newIntent.putExtra(MessageTypes.INTENT_EXTRA_NEW_USER_ID, 1);
+                        requireContext().sendBroadcast(newIntent);
                         if (interval < 200) {
                             // 双击事件处理
                             Intent intent = new Intent(MessageTypes.ACTION_GO_TO_PICK_PATIENTS);
@@ -117,6 +123,29 @@ public class PickPatientsFragment extends Fragment {
             holder.name.setText(friendEntity.friendName);
             holder.lastMessage.setText(friendEntity.lastMessage);
 
+            if (mode == DUAL_MODE) {
+                System.out.println("setting on click listener for pick.");
+                holder.view.setOnClickListener(v->{
+                    if (lastClickedTime == 0) {
+                        lastClickedTime = SystemClock.uptimeMillis();
+                    }
+                    else{
+                        long nowClickedTime = SystemClock.uptimeMillis();
+                        long interval = nowClickedTime -lastClickedTime;
+                        Intent newIntent = new Intent(MessageTypes.ACTION_ALTER_CHAT_CONTENTS);
+                        newIntent.putExtra(MessageTypes.INTENT_EXTRA_NEW_USER_ID, friendEntity.friendID);
+                        requireContext().sendBroadcast(newIntent);
+                        if (interval < 200) {
+                            // 双击事件处理
+                            Intent intent = new Intent(MessageTypes.ACTION_GO_TO_PICK_PATIENTS);
+                            requireContext().sendBroadcast(intent);
+                            System.out.println("Broadcast sent.");
+                        }
+
+                        lastClickedTime = nowClickedTime;
+                    }
+                });
+            }
         }
 
         @Override
