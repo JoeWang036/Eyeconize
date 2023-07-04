@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <string name="app_name">Eyeconize Family</string>
+    <string name="send">发送</string>
+    <style name="Base.Theme.Eyerecongize" parent="Theme.Material3.DayNight.NoActionBar">
+        
+        
+        <item name="android:statusBarColor">#57D99B</item>
+        <item name="backgroundColor">#F1F1F1</item>
+    </style>
+    <style name="Theme.Eyerecongize" parent="Base.Theme.Eyerecongize"/>
+</resources>

@@ -1,0 +1,58 @@
+[
+    {
+        "merged": "D:\\AndroidConfig\\.gradle\\daemon\\8.0\\com.codejustice.eyeconizefamily-mergeDebugResources-38:\\layout\\activity_pick_patient.xml",
+        "source": "D:\\AndroidConfig\\.gradle\\daemon\\8.0\\com.codejustice.eyeconizefamily-main-41:\\layout\\activity_pick_patient.xml"
+    },
+    {
+        "merged": "D:\\AndroidConfig\\.gradle\\daemon\\8.0\\com.codejustice.eyeconizefamily-mergeDebugResources-38:\\layout\\fragment_dual.xml",
+        "source": "D:\\AndroidConfig\\.gradle\\daemon\\8.0\\com.codejustice.eyeconizefamily-main-41:\\layout\\fragment_dual.xml"
+    },
+    {
+        "merged": "D:\\AndroidConfig\\.gradle\\daemon\\8.0\\com.codejustice.eyeconizefamily-mergeDebugResources-38:\\layout\\family_cell.xml",
+        "source": "D:\\AndroidConfig\\.gradle\\daemon\\8.0\\com.codejustice.eyeconizefamily-main-41:\\layout\\family_cell.xml"
+    },
+    {
+        "merged": "D:\\AndroidConfig\\.gradle\\daemon\\8.0\\com.codejustice.eyeconizefamily-mergeDebugResources-38:\\layout\\dialog_ask_available.xml",
+        "source": "D:\\AndroidConfig\\.gradle\\daemon\\8.0\\com.codejustice.eyeconizefamily-main-41:\\layout\\dialog_ask_available.xml"
+    },
+    {
+        "merged": "D:\\AndroidConfig\\.gradle\\daemon\\8.0\\com.codejustice.eyeconizefamily-mergeDebugResources-38:\\layout\\fragment_messages.xml",
+        "source": "D:\\AndroidConfig\\.gradle\\daemon\\8.0\\com.codejustice.eyeconizefamily-main-41:\\layout\\fragment_messages.xml"
+    },
+    {
+        "merged": "D:\\AndroidConfig\\.gradle\\daemon\\8.0\\com.codejustice.eyeconizefamily-mergeDebugResources-38:\\layout\\fragment_pick_patients.xml",
+        "source": "D:\\AndroidConfig\\.gradle\\daemon\\8.0\\com.codejustice.eyeconizefamily-main-41:\\layout\\fragment_pick_patients.xml"
+    },
+    {
+        "merged": "D:\\AndroidConfig\\.gradle\\daemon\\8.0\\com.codejustice.eyeconizefamily-mergeDebugResources-38:\\layout\\fragment_pick_patient_detailed.xml",
+        "source": "D:\\AndroidConfig\\.gradle\\daemon\\8.0\\com.codejustice.eyeconizefamily-main-41:\\layout\\fragment_pick_patient_detailed.xml"
+    },
+    {
+        "merged": "D:\\AndroidConfig\\.gradle\\daemon\\8.0\\com.codejustice.eyeconizefamily-mergeDebugResources-38:\\layout\\chat_view_time.xml",
+        "source": "D:\\AndroidConfig\\.gradle\\daemon\\8.0\\com.codejustice.eyeconizefamily-main-41:\\layout\\chat_view_time.xml"
+    },
+    {
+        "merged": "D:\\AndroidConfig\\.gradle\\daemon\\8.0\\com.codejustice.eyeconizefamily-mergeDebugResources-38:\\layout\\activity_main.xml",
+        "source": "D:\\AndroidConfig\\.gradle\\daemon\\8.0\\com.codejustice.eyeconizefamily-main-41:\\layout\\activity_main.xml"
+    },
+    {
+        "merged": "D:\\AndroidConfig\\.gradle\\daemon\\8.0\\com.codejustice.eyeconizefamily-mergeDebugResources-38:\\layout\\activity_send_messages_detailed.xml",
+        "source": "D:\\AndroidConfig\\.gradle\\daemon\\8.0\\com.codejustice.eyeconizefamily-main-41:\\layout\\activity_send_messages_detailed.xml"
+    },
+    {
+        "merged": "com.codejustice.eyeconizefamily-mergeDebugResources-38:/layout/chat_view_right.xml",
+        "source": "com.codejustice.eyeconizefamily-main-41:/layout/chat_view_right.xml"
+    },
+    {
+        "merged": "D:\\AndroidConfig\\.gradle\\daemon\\8.0\\com.codejustice.eyeconizefamily-mergeDebugResources-38:\\layout\\chat_view_left.xml",
+        "source": "D:\\AndroidConfig\\.gradle\\daemon\\8.0\\com.codejustice.eyeconizefamily-main-41:\\layout\\chat_view_left.xml"
+    },
+    {
+        "merged": "com.codejustice.eyeconizefamily-mergeDebugResources-38:/layout/chat_view_left.xml",
+        "source": "com.codejustice.eyeconizefamily-main-41:/layout/chat_view_left.xml"
+    },
+    {
+        "merged": "D:\\AndroidConfig\\.gradle\\daemon\\8.0\\com.codejustice.eyeconizefamily-mergeDebugResources-38:\\layout\\chat_view_right.xml",
+        "source": "D:\\AndroidConfig\\.gradle\\daemon\\8.0\\com.codejustice.eyeconizefamily-main-41:\\layout\\chat_view_right.xml"
+    }
+]

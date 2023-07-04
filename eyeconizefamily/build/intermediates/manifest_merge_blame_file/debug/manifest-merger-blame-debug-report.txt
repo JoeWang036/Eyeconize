@@ -1,0 +1,102 @@
+1<?xml version="1.0" encoding="utf-8"?>
+2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+3    package="com.codejustice.eyeconizefamily"
+4    android:versionCode="1"
+5    android:versionName="1.0" >
+6
+7    <uses-sdk
+8        android:minSdkVersion="24"
+8-->E:\Code\Eyeconize\eyeconizefamily\src\main\AndroidManifest.xml
+9        android:targetSdkVersion="33" />
+9-->E:\Code\Eyeconize\eyeconizefamily\src\main\AndroidManifest.xml
+10
+11    <uses-permission android:name="android.permission.INTERNET" />
+11-->E:\Code\Eyeconize\eyeconizefamily\src\main\AndroidManifest.xml:3:5-67
+11-->E:\Code\Eyeconize\eyeconizefamily\src\main\AndroidManifest.xml:3:22-64
+12
+13    <application
+13-->E:\Code\Eyeconize\eyeconizefamily\src\main\AndroidManifest.xml:5:5-28:19
+14        android:name="com.codejustice.eyeconizefamily.EyeconizeFamilyApplication"
+14-->E:\Code\Eyeconize\eyeconizefamily\src\main\AndroidManifest.xml:6:9-51
+15        android:allowBackup="true"
+15-->E:\Code\Eyeconize\eyeconizefamily\src\main\AndroidManifest.xml:7:9-35
+16        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
+16-->[androidx.core:core:1.8.0] D:\AndroidConfig\.gradle\caches\transforms-3\ac1a303dea3269c114b1c2a8763ac486\transformed\core-1.8.0\AndroidManifest.xml:24:18-86
+17        android:debuggable="true"
+18        android:extractNativeLibs="false"
+19        android:icon="@mipmap/ic_launcher"
+19-->E:\Code\Eyeconize\eyeconizefamily\src\main\AndroidManifest.xml:8:9-43
+20        android:label="@string/app_name"
+20-->E:\Code\Eyeconize\eyeconizefamily\src\main\AndroidManifest.xml:9:9-41
+21        android:roundIcon="@mipmap/ic_launcher_round"
+21-->E:\Code\Eyeconize\eyeconizefamily\src\main\AndroidManifest.xml:10:9-54
+22        android:supportsRtl="true"
+22-->E:\Code\Eyeconize\eyeconizefamily\src\main\AndroidManifest.xml:11:9-35
+23        android:theme="@style/Theme.Eyerecongize" >
+23-->E:\Code\Eyeconize\eyeconizefamily\src\main\AndroidManifest.xml:12:9-50
+24        <activity
+24-->E:\Code\Eyeconize\eyeconizefamily\src\main\AndroidManifest.xml:13:9-22:20
+25            android:name="com.codejustice.eyeconizefamily.MainActivity"
+25-->E:\Code\Eyeconize\eyeconizefamily\src\main\AndroidManifest.xml:14:13-41
+26            android:exported="true"
+26-->E:\Code\Eyeconize\eyeconizefamily\src\main\AndroidManifest.xml:16:13-36
+27            android:launchMode="singleTop" >
+27-->E:\Code\Eyeconize\eyeconizefamily\src\main\AndroidManifest.xml:15:13-43
+28            <intent-filter>
+28-->E:\Code\Eyeconize\eyeconizefamily\src\main\AndroidManifest.xml:17:13-21:29
+29                <action android:name="android.intent.action.MAIN" />
+29-->E:\Code\Eyeconize\eyeconizefamily\src\main\AndroidManifest.xml:18:17-69
+29-->E:\Code\Eyeconize\eyeconizefamily\src\main\AndroidManifest.xml:18:25-66
+30
+31                <category android:name="android.intent.category.LAUNCHER" />
+31-->E:\Code\Eyeconize\eyeconizefamily\src\main\AndroidManifest.xml:20:17-77
+31-->E:\Code\Eyeconize\eyeconizefamily\src\main\AndroidManifest.xml:20:27-74
+32            </intent-filter>
+33        </activity>
+34        <activity android:name="com.codejustice.eyeconizefamily.PickPatientDetailedActivity" />
+34-->E:\Code\Eyeconize\eyeconizefamily\src\main\AndroidManifest.xml:23:9-24:15
+34-->E:\Code\Eyeconize\eyeconizefamily\src\main\AndroidManifest.xml:23:19-62
+35        <activity
+35-->E:\Code\Eyeconize\eyeconizefamily\src\main\AndroidManifest.xml:25:9-27:46
+36            android:name="com.codejustice.eyeconizefamily.SendMessageActivity"
+36-->E:\Code\Eyeconize\eyeconizefamily\src\main\AndroidManifest.xml:26:13-48
+37            android:launchMode="singleTop" />
+37-->E:\Code\Eyeconize\eyeconizefamily\src\main\AndroidManifest.xml:27:13-43
+38
+39        <provider
+39-->[androidx.emoji2:emoji2:1.0.0] D:\AndroidConfig\.gradle\caches\transforms-3\741004095de1dc1a27407b4a04f829a4\transformed\emoji2-1.0.0\AndroidManifest.xml:26:9-34:20
+40            android:name="androidx.startup.InitializationProvider"
+40-->[androidx.emoji2:emoji2:1.0.0] D:\AndroidConfig\.gradle\caches\transforms-3\741004095de1dc1a27407b4a04f829a4\transformed\emoji2-1.0.0\AndroidManifest.xml:27:13-67
+41            android:authorities="com.codejustice.eyeconizefamily.androidx-startup"
+41-->[androidx.emoji2:emoji2:1.0.0] D:\AndroidConfig\.gradle\caches\transforms-3\741004095de1dc1a27407b4a04f829a4\transformed\emoji2-1.0.0\AndroidManifest.xml:28:13-68
+42            android:exported="false" >
+42-->[androidx.emoji2:emoji2:1.0.0] D:\AndroidConfig\.gradle\caches\transforms-3\741004095de1dc1a27407b4a04f829a4\transformed\emoji2-1.0.0\AndroidManifest.xml:29:13-37
+43            <meta-data
+43-->[androidx.emoji2:emoji2:1.0.0] D:\AndroidConfig\.gradle\caches\transforms-3\741004095de1dc1a27407b4a04f829a4\transformed\emoji2-1.0.0\AndroidManifest.xml:31:13-33:52
+44                android:name="androidx.emoji2.text.EmojiCompatInitializer"
+44-->[androidx.emoji2:emoji2:1.0.0] D:\AndroidConfig\.gradle\caches\transforms-3\741004095de1dc1a27407b4a04f829a4\transformed\emoji2-1.0.0\AndroidManifest.xml:32:17-75
+45                android:value="androidx.startup" />
+45-->[androidx.emoji2:emoji2:1.0.0] D:\AndroidConfig\.gradle\caches\transforms-3\741004095de1dc1a27407b4a04f829a4\transformed\emoji2-1.0.0\AndroidManifest.xml:33:17-49
+46            <meta-data
+46-->[androidx.lifecycle:lifecycle-process:2.4.0] D:\AndroidConfig\.gradle\caches\transforms-3\2156a24f791d7aaa44845ea1492277e6\transformed\lifecycle-process-2.4.0\AndroidManifest.xml:31:13-33:52
+47                android:name="androidx.lifecycle.ProcessLifecycleInitializer"
+47-->[androidx.lifecycle:lifecycle-process:2.4.0] D:\AndroidConfig\.gradle\caches\transforms-3\2156a24f791d7aaa44845ea1492277e6\transformed\lifecycle-process-2.4.0\AndroidManifest.xml:32:17-78
+48                android:value="androidx.startup" />
+48-->[androidx.lifecycle:lifecycle-process:2.4.0] D:\AndroidConfig\.gradle\caches\transforms-3\2156a24f791d7aaa44845ea1492277e6\transformed\lifecycle-process-2.4.0\AndroidManifest.xml:33:17-49
+49        </provider>
+50
+51        <uses-library
+51-->[androidx.window:window:1.0.0] D:\AndroidConfig\.gradle\caches\transforms-3\c8acf360ce1a1b3169c7ce47d14efb5f\transformed\window-1.0.0\AndroidManifest.xml:25:9-27:40
+52            android:name="androidx.window.extensions"
+52-->[androidx.window:window:1.0.0] D:\AndroidConfig\.gradle\caches\transforms-3\c8acf360ce1a1b3169c7ce47d14efb5f\transformed\window-1.0.0\AndroidManifest.xml:26:13-54
+53            android:required="false" />
+53-->[androidx.window:window:1.0.0] D:\AndroidConfig\.gradle\caches\transforms-3\c8acf360ce1a1b3169c7ce47d14efb5f\transformed\window-1.0.0\AndroidManifest.xml:27:13-37
+54        <uses-library
+54-->[androidx.window:window:1.0.0] D:\AndroidConfig\.gradle\caches\transforms-3\c8acf360ce1a1b3169c7ce47d14efb5f\transformed\window-1.0.0\AndroidManifest.xml:28:9-30:40
+55            android:name="androidx.window.sidecar"
+55-->[androidx.window:window:1.0.0] D:\AndroidConfig\.gradle\caches\transforms-3\c8acf360ce1a1b3169c7ce47d14efb5f\transformed\window-1.0.0\AndroidManifest.xml:29:13-51
+56            android:required="false" />
+56-->[androidx.window:window:1.0.0] D:\AndroidConfig\.gradle\caches\transforms-3\c8acf360ce1a1b3169c7ce47d14efb5f\transformed\window-1.0.0\AndroidManifest.xml:30:13-37
+57    </application>
+58
+59</manifest>
