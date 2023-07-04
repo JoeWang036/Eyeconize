@@ -21,6 +21,7 @@ package com.whu.eyerecongize.camera;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.Configuration;
+import android.graphics.Outline;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.SurfaceTexture;
@@ -30,7 +31,9 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewOutlineProvider;
 
 import com.huawei.hms.common.size.Size;
 
@@ -203,8 +206,11 @@ public class LensEnginePreview extends ViewGroup {
         for (int i = 0; i < this.getChildCount(); ++i) {
             // One dimension will be cropped. We shift child over or up by this offset and adjust
             // the size to maintain the proper aspect ratio.
-            this.getChildAt(i)
-                    .layout(-1 * childXOffset, -1 * childYOffset, childWidth - childXOffset, childHeight - childYOffset);
+//            this.getChildAt(i)
+//                    .layout(-1 * childXOffset, -1 * childYOffset, childWidth - childXOffset, childHeight - childYOffset);
+            View child = this.getChildAt(i);
+            child.layout(-1 * childXOffset, -1 * childYOffset, childWidth - childXOffset, childHeight - childYOffset);
+
         }
     }
 

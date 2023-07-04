@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:eyecon="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#E5E5E5"
+    android:padding="0dp"
+    tools:context=".HomePage3">
+    <ImageView
+        android:id="@+id/imageView3helper"
+        android:layout_width="171dp"
+        android:layout_height="44dp"
+        android:layout_marginStart="288dp"
+        android:layout_marginTop="16dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        eyecon:srcCompat="@drawable/helper_normal" />
+
+    <com.whu.eyerecongize.views.LongButton
+        android:id="@+id/longButton44"
+        android:layout_width="503dp"
+        android:layout_height="61dp"
+        android:layout_marginStart="96dp"
+        android:layout_marginTop="284dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        eyecon:codeID="@drawable/code1"
+        eyecon:contentID="@drawable/write"
+        eyecon:text="撰写文字信息" />
+
+    <com.whu.eyerecongize.views.LongButton
+        android:id="@+id/longButton43"
+        android:layout_width="503dp"
+        android:layout_height="61dp"
+        android:layout_marginStart="96dp"
+        android:layout_marginTop="224dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        eyecon:codeID="@drawable/code2"
+        eyecon:contentID="@drawable/ask"
+        eyecon:text="主动问询" />
+
+    <com.whu.eyerecongize.views.LongButton
+        android:id="@+id/longButton42"
+        android:layout_width="503dp"
+        android:layout_height="61dp"
+        android:layout_marginStart="96dp"
+        android:layout_marginTop="164dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        eyecon:codeID="@drawable/code3"
+        eyecon:contentID="@drawable/sound"
+        eyecon:text="播放声音" />
+
+    <com.whu.eyerecongize.camera.LensEnginePreview
+        android:id="@+id/face_preview"
+        android:layout_width="185dp"
+        android:layout_height="195dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="380dp"
+        android:background="@color/black"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/barButton32"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.31">
+
+        <com.whu.eyerecongize.views.overlay.GraphicOverlay
+            android:id="@+id/face_overlay"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentBottom="true" />
+    </com.whu.eyerecongize.camera.LensEnginePreview>
+
+    <com.whu.eyerecongize.views.BarButton
+        android:id="@+id/barButton31"
+        android:layout_width="96.6dp"
+        android:layout_height="147dp"
+        android:rotation="0"
+        android:rotationY="0"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintVertical_bias="0.0"
+        eyecon:contentID="@drawable/bar_use_deactivate"
+        eyecon:layout_constraintStart_toStartOf="parent"
+        eyecon:layout_constraintTop_toTopOf="parent"
+        eyecon:selectID="@drawable/bar_use_select"/>
+
+    <com.whu.eyerecongize.views.BarButton
+        android:id="@+id/barButton33"
+        android:layout_width="96.6dp"
+        android:layout_height="147dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintVertical_bias="0.992"
+        eyecon:contentID="@drawable/bar_other_select"
+        eyecon:layout_constraintStart_toStartOf="parent"
+        eyecon:layout_constraintTop_toTopOf="parent"
+        eyecon:selectID="@drawable/bar_other_select"/>
+
+    <com.whu.eyerecongize.views.BarButton
+        android:id="@+id/barButton32"
+        android:layout_width="96.6dp"
+        android:layout_height="147dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        eyecon:contentID="@drawable/bar_tool_deactivate"
+        eyecon:layout_constraintStart_toStartOf="parent"
+        eyecon:layout_constraintTop_toTopOf="parent"
+        eyecon:selectID="@drawable/bar_tool_select"/>
+
+    <com.whu.eyerecongize.views.LongButton
+        android:id="@+id/longButton41"
+        android:layout_width="503dp"
+        android:layout_height="61dp"
+        android:layout_marginStart="96dp"
+        android:layout_marginTop="104dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        eyecon:codeID="@drawable/code4"
+        eyecon:contentID="@drawable/connect"
+        eyecon:text="选择联系人" />
+
+    <ImageView
+        android:id="@+id/imageView3block"
+        android:layout_width="194dp"
+        android:layout_height="44dp"
+        android:layout_marginStart="112dp"
+        android:layout_marginTop="16dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        eyecon:srcCompat="@drawable/block_button" />
+
+    <com.whu.eyerecongize.views.ImageEditText
+        android:id="@+id/imageEditText31"
+        android:layout_width="219dp"
+        android:layout_height="46dp"
+        android:layout_marginStart="464dp"
+        android:layout_marginBottom="28dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/barButton33"
+        app:layout_constraintTop_toBottomOf="@+id/face_preview"
+        app:layout_constraintVertical_bias="0.306"
+        eyecon:barStatus="13"/>
+
+    <TextView
+        android:id="@+id/textView3time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="20dp"
+        android:text="9:12"
+        app:layout_constraintBottom_toTopOf="@+id/face_preview"
+        app:layout_constraintEnd_toEndOf="@+id/face_preview" />
+
+    <ImageView
+        android:id="@+id/imageView3next"
+        android:layout_width="124dp"
+        android:layout_height="22dp"
+        android:layout_marginStart="320dp"
+        android:layout_marginTop="65dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        eyecon:srcCompat="@drawable/nextpage" />
+
+    <ImageView
+        android:id="@+id/imageView3last"
+        android:layout_width="135dp"
+        android:layout_height="25dp"
+        android:layout_marginStart="152dp"
+        android:layout_marginTop="64dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        eyecon:srcCompat="@drawable/lastpage" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

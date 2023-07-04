@@ -19,16 +19,33 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
+        android:testOnly="false"
         android:theme="@style/Theme.Eyerecongize"
         android:usesCleartextTraffic="true"
-        tools:targetApi="31"
-        android:testOnly="false">
+        tools:targetApi="31">
         <activity
-            android:name=".testActivity"
+            android:name=".getMessage"
             android:exported="false" />
         <activity
+            android:name=".HomePage3"
+            android:exported="false"
+            android:screenOrientation="landscape" />
+        <activity
+            android:name=".HomePage2"
+            android:exported="false"
+            android:screenOrientation="landscape" />
+        <activity
+            android:name=".HomePage1"
+            android:exported="false"
+            android:screenOrientation="landscape" />
+        <activity
+            android:name=".testActivity"
+            android:exported="false"
+            android:screenOrientation="landscape" />
+        <activity
             android:name=".MainActivity"
-            android:exported="true">
+            android:exported="true"
+            android:screenOrientation="landscape">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

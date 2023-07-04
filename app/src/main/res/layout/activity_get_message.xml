@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:eyecon="http://schemas.android.com/apk/res-auto"
+    android:background="#E5E5E5"
+    tools:context=".getMessage">
+
+    <LinearLayout
+        android:id="@+id/linearLayout"
+        android:layout_width="442dp"
+        android:layout_height="415dp"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:paddingTop="80dp"
+        >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/imageViewdot"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                eyecon:srcCompat="@drawable/message_dot" />
+
+            <TextView
+                android:id="@+id/textViewWho"
+                android:layout_width="194dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="9"
+                android:text="来自女儿"
+                android:textColor="#6D6D6D"
+                android:textSize="18sp" />
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/textViewMes"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="18dp"
+            android:layout_marginBottom="10dp"
+            android:text="中午12点了，需要现在吃午饭嘛？"
+            android:textSize="28sp" />
+
+        <ImageView
+            android:id="@+id/imageViewyes"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            eyecon:srcCompat="@drawable/yes"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"/>
+
+        <ImageView
+            android:id="@+id/imageViewno"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            eyecon:srcCompat="@drawable/no"
+            android:layout_marginTop="10dp"
+            />
+    </LinearLayout>
+
+    <com.whu.eyerecongize.camera.LensEnginePreview
+        android:id="@+id/face_preview"
+        android:layout_width="206dp"
+        android:layout_height="226dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="46dp"
+        android:background="@color/black"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toEndOf="@+id/linearLayout"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.383">
+
+        <com.whu.eyerecongize.views.overlay.GraphicOverlay
+            android:id="@+id/face_overlay"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentBottom="true" />
+    </com.whu.eyerecongize.camera.LensEnginePreview>
+
+    <com.whu.eyerecongize.views.ImageEditText
+        android:id="@+id/imageEditTextMessage"
+        android:layout_width="236dp"
+        android:layout_height="58dp"
+        android:layout_marginStart="28dp"
+        android:layout_marginBottom="28dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/linearLayout"
+        app:layout_constraintTop_toBottomOf="@+id/face_preview"
+        app:layout_constraintVertical_bias="0.678"
+        eyecon:barStatus="14" />
+
+    <TextView
+        android:id="@+id/textViewMestime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:layout_marginEnd="8dp"
+        android:text="9:12"
+        app:layout_constraintBottom_toTopOf="@+id/face_preview"
+        app:layout_constraintEnd_toEndOf="@+id/face_preview"
+        app:layout_constraintTop_toTopOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -96,7 +96,7 @@ public class LocalFaceGraphic extends BaseGraphic {
         this.keypointPaint.setStrokeWidth(CommonUtils.dp2px(this.mContext, 2));
 
         this.eyePaint = new Paint();
-        this.eyePaint.setColor(Color.parseColor("#00ccff"));
+        this.eyePaint.setColor(Color.parseColor("#ffffff"));
         this.eyePaint.setStyle(Paint.Style.STROKE);
         this.eyePaint.setStrokeWidth(lineWidth);
 
@@ -121,7 +121,7 @@ public class LocalFaceGraphic extends BaseGraphic {
         this.lipPaint.setStrokeWidth(lineWidth);
 
         this.borderPaint = new Paint();
-        this.borderPaint.setColor(Color.parseColor("#ffcc66"));
+        this.borderPaint.setColor(Color.parseColor("#e5e5e5"));
         this.borderPaint.setStyle(Paint.Style.STROKE);
         this.borderPaint.setStrokeWidth(lineWidth);
     }
@@ -303,15 +303,12 @@ public class LocalFaceGraphic extends BaseGraphic {
                 if (point == null) {
                     continue;
                 }
-                canvas.drawPoint(this.translateX(point.getX().floatValue()), this.translateY(point.getY().floatValue()), this.faceFeaturePaint);
+                //canvas.drawPoint(this.translateX(point.getX().floatValue()), this.translateY(point.getY().floatValue()), this.faceFeaturePaint);
                 if (i != (leftpoints.size() - 1)) {
                     MLPosition next = leftpoints.get(i + 1);
                     if (point.getX() != null && point.getY() != null) {
                         canvas.drawLines(new float[]{this.translateX(point.getX().floatValue()), this.translateY(point.getY().floatValue()),
                                 this.translateX(next.getX().floatValue()), this.translateY(next.getY().floatValue())}, this.eyePaint);
-                        if (i % 3 == 0) {
-                            canvas.drawText(i + 1 + "", this.translateX(point.getX().floatValue()), this.translateY(point.getY().floatValue()), this.textPaint);
-                        }
                     }
                 }
             }
@@ -321,15 +318,12 @@ public class LocalFaceGraphic extends BaseGraphic {
                 if (point == null) {
                     continue;
                 }
-                canvas.drawPoint(this.translateX(point.getX().floatValue()), this.translateY(point.getY().floatValue()), this.faceFeaturePaint);
+                //canvas.drawPoint(this.translateX(point.getX().floatValue()), this.translateY(point.getY().floatValue()), this.faceFeaturePaint);
                 if (i != (rightpoints.size() - 1)) {
                     MLPosition next = rightpoints.get(i + 1);
                     if (point.getX() != null && point.getY() != null) {
                         canvas.drawLines(new float[]{this.translateX(point.getX().floatValue()), this.translateY(point.getY().floatValue()),
                                 this.translateX(next.getX().floatValue()), this.translateY(next.getY().floatValue())}, this.eyePaint);
-                        if (i % 3 == 0) {
-                            canvas.drawText(i + 1 + "", this.translateX(point.getX().floatValue()), this.translateY(point.getY().floatValue()), this.textPaint);
-                        }
                     }
                 }
             }
