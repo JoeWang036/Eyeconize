@@ -16,3 +16,5 @@ dependencyResolutionManagement {
 }
 rootProject.name = "eyerecongize"
 include ':app'
+include ':eyeconizefamily'
+include ':net_library'
