@@ -1,7 +1,7 @@
 package com.codejustice.enums;
 
 public class MessageTypes {
-    public static final int HANDLER_UPDATE_MESSAGE = 1;
+    public static final int HANDLER_NEW_MESSAGE = 1;
     public static final int HANDLER_CHANGE_CONNECTION_STATUS = 2;
     public static final int HANDLER_DONE_INITIALIZATION = 3;
     public static final int HANDLER_REQUEST_SEND_MESSAGE = 4;

@@ -8,8 +8,6 @@ import com.codejustice.enums.MessageTypes;
 import com.codejustice.global.Global;
 import com.codejustice.utils.db.MessagesDBHelper;
 
-import java.util.Spliterator;
-
 import NetService.ConnectionUtils.ConnectionManager;
 import NetService.ConnectionUtils.ConnectionObserver;
 import NetService.MessageProtocol.CommunicationMessage;
@@ -63,7 +61,7 @@ public class NetThread extends HandlerThread implements ConnectionObserver {
                 connectionManager.setConnected(false);
             } else if (message instanceof TextMessage) {
                 connectionManager.notifyMessageObserversGet((TextMessage) message);
-                Message msg = handler.obtainMessage(MessageTypes.HANDLER_UPDATE_MESSAGE);
+                Message msg = handler.obtainMessage(MessageTypes.HANDLER_NEW_MESSAGE);
                 msg.obj = message;
                 handler.sendMessage(msg);
             } else if (message instanceof ConfirmMessage) {
@@ -89,7 +87,7 @@ public class NetThread extends HandlerThread implements ConnectionObserver {
 //                        connectionManager.sendTextMessage(content, Global.receiverID, (short) 1);
                         break;
 
-                    case MessageTypes.HANDLER_UPDATE_MESSAGE:
+                    case MessageTypes.HANDLER_NEW_MESSAGE:
                         break;
                     case MessageTypes.HANDLER_CHANGE_CONNECTION_STATUS:
                         break;
