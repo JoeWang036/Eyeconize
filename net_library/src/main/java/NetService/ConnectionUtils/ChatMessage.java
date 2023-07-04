@@ -1,5 +1,7 @@
 package NetService.ConnectionUtils;
 
+import android.text.BoringLayout;
+
 import androidx.annotation.Nullable;
 
 import NetService.MessageProtocol.TextMessage;
@@ -14,6 +16,7 @@ public class ChatMessage extends ChatMessageAbstract{
     public static final byte FAILED = 2;
     public long timestamp;  // 添加时间属性
 
+    public boolean isQuestion = false;
     public ChatMessage(String messageContent, long senderID, long timestamp, short messageSerial, byte sentStatus) {
         this.messageContent = messageContent;
         this.senderID = senderID;
@@ -28,6 +31,7 @@ public class ChatMessage extends ChatMessageAbstract{
         this.timestamp = textMessage.getSendTime();
         this.messageSerial = textMessage.getMessageSerial();
         this.sentStatus = SENT;
+        isQuestion = textMessage.isQuestion;
     }
     // 添加 getter 和 setter 方法（根据需要）
 

@@ -35,15 +35,19 @@ public class TextMessageCoder implements Coder {
         }
         ByteBuffer bb = ByteBuffer.wrap(byteArray);
         byte type = bb.get();
-        if (type == CodeTypeHeader.TEXT_MESSAGE) {
+        if (type == CodeTypeHeader.TEXT_MESSAGE || type == CodeTypeHeader.SIMPLE_QUESTION_MESSAGE) {
             short messageSerial = bb.getShort();
             long senderID = bb.getLong();
             long sendTime = bb.getLong();
             byte[] dataBytes = new byte[bb.remaining()];
             bb.get(dataBytes);
             String data = new String(dataBytes);
-            return new TextMessage(data, messageSerial, senderID, sendTime);
-        }else return null;
+            TextMessage textMessage = new TextMessage(data, messageSerial, senderID, sendTime);
+            textMessage.isQuestion = (type==CodeTypeHeader.SIMPLE_QUESTION_MESSAGE);
+            return textMessage;
+        } else {
+            return null;
+        }
 
     }
 

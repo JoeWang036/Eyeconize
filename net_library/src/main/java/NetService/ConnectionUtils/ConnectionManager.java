@@ -33,7 +33,7 @@ public class ConnectionManager {
 
     private final List<ConnectionObserver> connectionObservers = new ArrayList<>();
     private final List<MessageObserver> messageObservers = new ArrayList<>();
-    private final List<PageObserver> pageObservers = new ArrayList<>();
+    private PageObserver pageObserver;
 
 
 
@@ -45,6 +45,8 @@ public class ConnectionManager {
     public long getSelfID() {
         return selfID;
     }
+    public void setSelfID(){
+        this.selfID = selfID;}
 
     public void setConnected(boolean connected) {
         synchronized (instance) {
@@ -111,33 +113,27 @@ public class ConnectionManager {
 
     public void registerPageObserver(PageObserver observer) {
         synchronized (this) {
-            if(!pageObservers.contains(observer)){
-                pageObservers.add(observer);
-            }
+            pageObserver = observer;
         }
     }
     public void unregisterPageObserver(PageObserver observer) {
-        pageObservers.remove(observer);
+        synchronized (this) {
+            if (pageObserver == observer) {
+                pageObserver= null;
+            }
+        }
     }
 
     public void notifyPageObservers(ChatMessage chatMessage) {
-        for (PageObserver pageObserver :
-                pageObservers) {
+
             pageObserver.newMessageAlert(chatMessage);
-        }
     }
     private void notifyConnectionObservers() {
         for (ConnectionObserver observer : connectionObservers) {
             observer.onValueChange(connected);
         }
     }
-    public void notifyMessageObserversGet(TextMessage textMessage){
-        System.out.println("message observers count: "+messageObservers.size());
-        for (MessageObserver observer :
-                messageObservers) {
-            observer.getMessage(textMessage);
-        }
-    }
+
 
     public void notifyMessageObserverRefresh(ConfirmMessage confirmMessage) {
         for (MessageObserver observer :
@@ -225,7 +221,9 @@ public class ConnectionManager {
     public short sendTextMessage(String textMessage, long receiverID, short sendSerial, long sendTime) {
 
 
+
         byte[] data = textMessageCoder.encode(textMessage,sendSerial, receiverID);
+        textMessageCoder.setSenderID(selfID);
         if (!connected) {
             System.out.println("Connection manager 176: trying to connect.");
             tryToConnect();

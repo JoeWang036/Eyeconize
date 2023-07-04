@@ -95,23 +95,24 @@ public class MessagesDBHelper extends SQLiteOpenHelper {
 //        values.put(TIME_KEY, sendTime);
 //        currentDatabase.insert(currentTableName, null, values);
 //    }
-    public void insertData(ChatMessage msg) {
-        ContentValues values = new ContentValues();
-        currentDatabase = getWritableDatabase();
-        if(msg.senderID != Global.selfID && !currentTableName.equals(genTableName(Global.selfID, msg.senderID))){
-            System.out.println(currentTableName);
-            System.out.println(genTableName(Global.selfID, msg.senderID));
-            System.out.println("switching...");
-            switchTable(Global.selfID, msg.senderID);
-        }
-        System.out.println("inserting data.");
-        values.put(ID_KEY, msg.senderID);
-        values.put(CONTENT_KEY, msg.messageContent);
-        values.put(TIME_KEY, msg.timestamp);
-        values.put(SENT_KEY, msg.sentStatus);
-        values.put(SERIAL_KEY, msg.messageSerial);
-        System.out.println(currentDatabase.insert(currentTableName, null, values));
+public void insertData(ChatMessage msg) {
+    ContentValues values = new ContentValues();
+    currentDatabase = getWritableDatabase();
+    if (msg.senderID != Global.selfID && !currentTableName.equals(genTableName(Global.selfID, msg.senderID))) {
+        System.out.println(currentTableName);
+        System.out.println(genTableName(Global.selfID, msg.senderID));
+        System.out.println("switching...");
+        switchTable(Global.selfID, msg.senderID);
     }
+    System.out.println("inserting data.");
+    values.put(ID_KEY, msg.senderID);
+    values.put(CONTENT_KEY, msg.messageContent);
+    values.put(TIME_KEY, msg.timestamp);
+    values.put(SENT_KEY, msg.sentStatus);
+    values.put(SERIAL_KEY, msg.messageSerial);
+    System.out.println(currentDatabase.insertWithOnConflict(currentTableName, null, values, SQLiteDatabase.CONFLICT_IGNORE));
+}
+
 
     public short getLastSerial(long otherID) {
         short res = 0;
@@ -133,15 +134,22 @@ public class MessagesDBHelper extends SQLiteOpenHelper {
         long sendTime = message.sendTime;
         SQLiteDatabase db = getWritableDatabase();
 
+        // 更新目标元组的sentStatus和sendTime字段
         ContentValues values = new ContentValues();
         values.put(SENT_KEY, ChatMessage.SENT);
         values.put(TIME_KEY, sendTime);
 
-        String whereClause = SERIAL_KEY + " = ? AND " + ID_KEY + " = ?";
+        // 构建子查询，获取TIME_KEY值最大的记录的sendTime
+        String subQuery = "SELECT MAX(" + TIME_KEY + ") FROM " + currentTableName + " WHERE " + SERIAL_KEY + " = ? AND " + ID_KEY + " = ?";
+        String[] subArgs = {String.valueOf(serial), String.valueOf(senderID)};
+
+        // 构建更新条件，只更新TIME_KEY值最大的记录
+        String whereClause = TIME_KEY + " = (" + subQuery + ")";
         String[] whereArgs = {String.valueOf(serial), String.valueOf(senderID)};
 
+        // 执行更新操作
         int i = db.update(currentTableName, values, whereClause, whereArgs);
-        System.out.println("updating..."+i);
+        System.out.println("updating..." + i);
     }
 
     public void updateSentStatusFail(long receiverID, long sendTime, short messageSerial) {
@@ -208,14 +216,17 @@ public class MessagesDBHelper extends SQLiteOpenHelper {
         Cursor cursor = getCursor();
         if (cursor.moveToFirst()) {
             System.out.println("content detected.");
+            int i = 1;
             long lastSendTime = 0;
             do {
+                System.out.println("database: getting message no."+i++);
                 long senderID = cursor.getLong(cursor.getColumnIndexOrThrow(ID_KEY));
                 String message = cursor.getString(cursor.getColumnIndexOrThrow(CONTENT_KEY));
                 long sendTime = cursor.getLong(cursor.getColumnIndexOrThrow(TIME_KEY));
                 short messageSerial = cursor.getShort(cursor.getColumnIndexOrThrow(SERIAL_KEY));
                 byte sent = (byte)cursor.getShort(cursor.getColumnIndexOrThrow(SENT_KEY));
                 System.out.println("sent status of"+ sendTime+": "+sent);
+                System.out.println(message);
 
                 ChatMessage cm = new ChatMessage(message, senderID, sendTime, messageSerial, sent);
                 System.out.println(sendTime);

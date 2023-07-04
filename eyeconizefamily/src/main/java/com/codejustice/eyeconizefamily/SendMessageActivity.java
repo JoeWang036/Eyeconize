@@ -146,6 +146,9 @@ public class SendMessageActivity extends AppCompatActivity implements ReplierAct
 
                         break;
                     case MessageTypes.HANDLER_NEW_MESSAGE:
+                        messagesFragment.getMessage((ChatMessage) message.obj);
+
+
                         AskAvailableDialog askAvailableDialog = new AskAvailableDialog(SendMessageActivity.this, R.style.AskAvailableStyle, (ChatMessage) message.obj, connectionManager, SendMessageActivity.this);
                         askAvailableDialog.show();
                     default:
@@ -164,7 +167,9 @@ public class SendMessageActivity extends AppCompatActivity implements ReplierAct
 
         System.out.println("main view destroyed.");
     }
-
+    private void renewMessageSerial(){
+        Global.messageSerial = messagesDBHelper.getLastSerial(Global.receiverID);
+    }
 
     @Override
     protected void onStart(){
@@ -179,6 +184,7 @@ public class SendMessageActivity extends AppCompatActivity implements ReplierAct
         if (!content.trim().equals("")) {
             Global.receiverID = receiverID;
             //TODO 完善页面跳转逻辑，当消息接收者不是当前接收者时改变显示内容
+            renewMessageSerial();
 
             System.out.println("connection manager id:");
             System.out.println(connectionManager.getSelfID());

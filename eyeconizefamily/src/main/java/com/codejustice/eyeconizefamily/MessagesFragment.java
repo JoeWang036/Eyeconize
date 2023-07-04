@@ -135,6 +135,8 @@ public class MessagesFragment extends Fragment implements MessageObserver {
         messagesDbHelper.switchTable(Global.selfID, Global.receiverID);
         messages = messagesDbHelper.getChatMessages();
         int position = messages.size() - 1;
+        System.out.println("message size:"+messages.size());
+        System.out.println("notifying data set changed.");
         chatContentAdapter.notifyDataSetChanged();
         chatView.scrollToPosition(position);
     }
@@ -173,6 +175,7 @@ public class MessagesFragment extends Fragment implements MessageObserver {
             messages.add(new TimeShowingMessage(message.timestamp));
         }
         newestTime = message.timestamp;
+        System.out.println("adding message.....");
 
         messages.add(message);
         messagesDbHelper.insertData(message);
@@ -185,11 +188,9 @@ public class MessagesFragment extends Fragment implements MessageObserver {
 
 
     //收到消息时对数据库进行更新
-    @Override
-    public void getMessage(TextMessage textMessage) {
-        ChatMessage chatMessage = new ChatMessage(textMessage.getMessage(), textMessage.getSenderID(), textMessage.getSendTime(), textMessage.getMessageSerial(), ChatMessage.SENT);
-        System.out.println("getting message...");
 
+    public void getMessage(ChatMessage chatMessage) {
+        System.out.println("getting message...");
         Message message = handler.obtainMessage(MessageTypes.HANDLER_NEW_MESSAGE, chatMessage);
         handler.sendMessage(message);
     }

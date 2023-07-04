@@ -61,7 +61,8 @@ public class NetThread extends HandlerThread implements ConnectionObserver {
             if (message == null) {
                 connectionManager.setConnected(false);
             } else if (message instanceof TextMessage) {
-                connectionManager.notifyMessageObserversGet((TextMessage) message);
+                //TODO 删掉
+
                 Message msg = handler.obtainMessage(MessageTypes.HANDLER_NEW_MESSAGE);
                 ChatMessage chatMessage = new ChatMessage((TextMessage) message);
                 connectionManager.notifyPageObservers(chatMessage);
@@ -77,8 +78,6 @@ public class NetThread extends HandlerThread implements ConnectionObserver {
     public void startThread(){
         start();
         System.out.println(getLooper());
-
-
         handler = new Handler(getLooper()){
             @Override
             public void handleMessage(Message msg) {

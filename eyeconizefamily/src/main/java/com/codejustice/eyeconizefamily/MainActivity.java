@@ -105,6 +105,9 @@ public class MainActivity extends AppCompatActivity implements PageObserver, Rep
                         finish();
                         break;
                     case MessageTypes.HANDLER_NEW_MESSAGE:
+
+
+                        messagesFragment.getMessage((ChatMessage) message.obj);
                         AskAvailableDialog askAvailableDialog = new AskAvailableDialog(MainActivity.this, R.style.AskAvailableStyle, (ChatMessage) message.obj, connectionManager, MainActivity.this);
                         askAvailableDialog.show();
                     default:
