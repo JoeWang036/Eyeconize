@@ -73,7 +73,7 @@ public class MessagesFragment extends Fragment implements MessageObserver {
             public void handleMessage(Message msg) {
                 if (handlerEnabled) {
                     switch (msg.what) {
-                        case MessageTypes.HANDLER_UPDATE_MESSAGE:
+                        case MessageTypes.HANDLER_NEW_MESSAGE:
                             ChatMessage cm = (ChatMessage) msg.obj;
                             System.out.println("adding...");
                             System.out.println(mode);
@@ -189,7 +189,7 @@ public class MessagesFragment extends Fragment implements MessageObserver {
         ChatMessage chatMessage = new ChatMessage(textMessage.getMessage(), textMessage.getSenderID(), textMessage.getSendTime(), textMessage.getMessageSerial(), ChatMessage.SENT);
         System.out.println("getting message...");
 
-        Message message = handler.obtainMessage(MessageTypes.HANDLER_UPDATE_MESSAGE, chatMessage);
+        Message message = handler.obtainMessage(MessageTypes.HANDLER_NEW_MESSAGE, chatMessage);
         handler.sendMessage(message);
     }
 

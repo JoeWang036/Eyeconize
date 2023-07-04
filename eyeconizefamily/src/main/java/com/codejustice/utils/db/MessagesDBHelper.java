@@ -77,10 +77,10 @@ public class MessagesDBHelper extends SQLiteOpenHelper {
 
     private void createNewTable(long hostID, long otherID) {
         SQLiteDatabase db = getWritableDatabase();
-        String createTableQuery = "DROP TABLE IF EXISTS " + genTableName(hostID, otherID);
-        db.execSQL(createTableQuery);
+//        String createTableQuery = "DROP TABLE IF EXISTS " + genTableName(hostID, otherID);
+//        db.execSQL(createTableQuery);
 
-        createTableQuery = ("CREATE TABLE IF NOT EXISTS " + genTableName(hostID, otherID) + " (id INTEGER, content text, sendTime INTEGER, sentStatus INTEGER, messageSerial INTEGER)");
+        String createTableQuery = ("CREATE TABLE IF NOT EXISTS " + genTableName(hostID, otherID) + " (id INTEGER, content text, sendTime INTEGER, sentStatus INTEGER, messageSerial INTEGER)");
         db.execSQL(createTableQuery);
     }
 
