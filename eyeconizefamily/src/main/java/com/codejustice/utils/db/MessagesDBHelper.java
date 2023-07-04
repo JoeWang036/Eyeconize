@@ -6,9 +6,9 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import com.codejustice.entities.ChatMessage;
-import com.codejustice.entities.ChatMessageAbstract;
-import com.codejustice.entities.TimeShowingMessage;
+import NetService.ConnectionUtils.ChatMessage;
+import NetService.ConnectionUtils.ChatMessageAbstract;
+import NetService.ConnectionUtils.TimeShowingMessage;
 import com.codejustice.global.Global;
 
 import java.util.ArrayList;
@@ -77,10 +77,10 @@ public class MessagesDBHelper extends SQLiteOpenHelper {
 
     private void createNewTable(long hostID, long otherID) {
         SQLiteDatabase db = getWritableDatabase();
-        String createTableQuery = "DROP TABLE IF EXISTS " + genTableName(hostID, otherID);
-        db.execSQL(createTableQuery);
+//        String createTableQuery = "DROP TABLE IF EXISTS " + genTableName(hostID, otherID);
+//        db.execSQL(createTableQuery);
 
-        createTableQuery = ("CREATE TABLE IF NOT EXISTS " + genTableName(hostID, otherID) + " (id INTEGER, content text, sendTime INTEGER, sentStatus INTEGER, messageSerial INTEGER)");
+        String createTableQuery = ("CREATE TABLE IF NOT EXISTS " + genTableName(hostID, otherID) + " (id INTEGER, content text, sendTime INTEGER, sentStatus INTEGER, messageSerial INTEGER)");
         db.execSQL(createTableQuery);
     }
 
@@ -98,9 +98,11 @@ public class MessagesDBHelper extends SQLiteOpenHelper {
     public void insertData(ChatMessage msg) {
         ContentValues values = new ContentValues();
         currentDatabase = getWritableDatabase();
-        if(!currentTableName.equals(genTableName(Global.selfID, Global.receiverID))){
+        if(msg.senderID != Global.selfID && !currentTableName.equals(genTableName(Global.selfID, msg.senderID))){
+            System.out.println(currentTableName);
+            System.out.println(genTableName(Global.selfID, msg.senderID));
             System.out.println("switching...");
-            switchTable(Global.selfID, Global.receiverID);
+            switchTable(Global.selfID, msg.senderID);
         }
         System.out.println("inserting data.");
         values.put(ID_KEY, msg.senderID);
@@ -110,6 +112,20 @@ public class MessagesDBHelper extends SQLiteOpenHelper {
         values.put(SERIAL_KEY, msg.messageSerial);
         System.out.println(currentDatabase.insert(currentTableName, null, values));
     }
+
+    public short getLastSerial(long otherID) {
+        short res = 0;
+        currentTableName = genTableName(Global.selfID, otherID);
+        String[] columns = {SERIAL_KEY};
+        String orderBy = "sendTime DESC"; // 按照sendTime从大到小排序
+        Cursor c =  currentDatabase.query(currentTableName, columns, null, null, null, null, orderBy);
+        if (c.moveToFirst()) {
+            res = c.getShort(c.getColumnIndexOrThrow(SERIAL_KEY));
+        }
+        c.close();
+        return res;
+    }
+
 
     public void updateSentStatus(ConfirmMessage message) {
         short serial = message.messageSerial;

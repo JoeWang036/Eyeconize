@@ -13,12 +13,24 @@ import android.os.Message;
 import android.view.View;
 import android.widget.FrameLayout;
 
+import com.codejustice.dialogs.AskAvailableDialog;
 import com.codejustice.enums.MessageTypes;
+import com.codejustice.global.Global;
+import com.codejustice.utils.db.MessagesDBHelper;
 
-public class MainActivity extends AppCompatActivity {
+import NetService.ConnectionUtils.ChatMessage;
+import NetService.ConnectionUtils.ConnectionManager;
+import NetService.ConnectionUtils.PageObserver;
+import NetService.MessageProtocol.TextMessage;
+
+public class MainActivity extends AppCompatActivity implements PageObserver, ReplierActivity{
 
     private DualFragment dualFragment;
     Handler handler;
+    ConnectionManager connectionManager;
+    MessagesDBHelper messagesDBHelper;
+
+    private MessagesFragment messagesFragment;
 
     private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
@@ -45,6 +57,15 @@ public class MainActivity extends AppCompatActivity {
         registerReceiver(broadcastReceiver, intentFilter);
         intentFilter = new IntentFilter(MessageTypes.ACTION_GO_TO_PICK_PATIENTS);
         registerReceiver(broadcastReceiver, intentFilter);
+        connectionManager.registerPageObserver(this);
+        if (Global.SEND_NEW_MESSAGE) {
+            while (!Global.messagesToSend.isEmpty()){
+                TextMessage tm = Global.messagesToSend.get(0);
+                sendMessage(tm.getMessage(), Global.receiverID);
+                Global.messagesToSend.remove(0);
+            }
+        }
+
     }
 
     @Override
@@ -52,6 +73,11 @@ public class MainActivity extends AppCompatActivity {
         super.onPause();
         // 取消注册广播接收器
         unregisterReceiver(broadcastReceiver);
+        connectionManager.unregisterPageObserver(this);
+
+    }
+    private void renewMessageSerial(){
+        Global.messageSerial = messagesDBHelper.getLastSerial(Global.receiverID);
     }
 
 
@@ -59,7 +85,10 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        messagesDBHelper = MessagesDBHelper.getInstance(this);
 
+        connectionManager = ConnectionManager.getInstance();
+        connectionManager.registerPageObserver(this);
         // 创建 DualFragment 实例并添加到布局中
         dualFragment = new DualFragment();
         getSupportFragmentManager().beginTransaction()
@@ -75,6 +104,9 @@ public class MainActivity extends AppCompatActivity {
                         startActivity(intent);
                         finish();
                         break;
+                    case MessageTypes.HANDLER_NEW_MESSAGE:
+                        AskAvailableDialog askAvailableDialog = new AskAvailableDialog(MainActivity.this, R.style.AskAvailableStyle, (ChatMessage) message.obj, connectionManager, MainActivity.this);
+                        askAvailableDialog.show();
                     default:
                         break;
 
@@ -90,11 +122,35 @@ public class MainActivity extends AppCompatActivity {
         PickPatientsFragment familyPickerFragment = new PickPatientsFragment(PickPatientsFragment.DUAL_MODE);
         dualFragment.replaceFamilyPickerFragment(familyPickerFragment);
         // 替换 ChatFragment
-        MessagesFragment chatFragment = new MessagesFragment(MessagesFragment.DUAL_MODE);
 
-        dualFragment.replaceChatFragment(chatFragment);
+         messagesFragment = new MessagesFragment(MessagesFragment.DUAL_MODE);
+
+        dualFragment.replaceChatFragment(messagesFragment);
+        connectionManager.registerPageObserver(this);
 
 
+    }
 
+    @Override
+    public void newMessageAlert(ChatMessage chatMessage) {
+        Message message = handler.obtainMessage(MessageTypes.HANDLER_NEW_MESSAGE, chatMessage);
+        handler.sendMessage(message);
+    }
+
+    @Override
+    public void sendMessage(String content, long receiverID) {
+        if (!content.trim().equals("")) {
+            System.out.println("connection manager id:");
+            System.out.println(connectionManager.getSelfID());
+            renewMessageSerial();
+            Global.messageSerial++;
+            Global.messageSerial = (short)(Global.messageSerial%10000);
+            long sendTime = System.currentTimeMillis();
+            messagesFragment.addMessage(new ChatMessage(content, Global.selfID, sendTime, Global.messageSerial, ChatMessage.SENDING));
+
+            new Thread(()->{
+                connectionManager.sendTextMessage(content, Global.receiverID, Global.messageSerial, sendTime);
+            }).start();
+        }
     }
 }

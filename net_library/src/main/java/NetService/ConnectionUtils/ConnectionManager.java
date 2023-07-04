@@ -33,6 +33,7 @@ public class ConnectionManager {
 
     private final List<ConnectionObserver> connectionObservers = new ArrayList<>();
     private final List<MessageObserver> messageObservers = new ArrayList<>();
+    private final List<PageObserver> pageObservers = new ArrayList<>();
 
 
 
@@ -105,7 +106,25 @@ public class ConnectionManager {
     }
 
     public void unregisterMessageObserver(MessageObserver observer) {
-        messageObservers.add(observer);
+        messageObservers.remove(observer);
+    }
+
+    public void registerPageObserver(PageObserver observer) {
+        synchronized (this) {
+            if(!pageObservers.contains(observer)){
+                pageObservers.add(observer);
+            }
+        }
+    }
+    public void unregisterPageObserver(PageObserver observer) {
+        pageObservers.remove(observer);
+    }
+
+    public void notifyPageObservers(ChatMessage chatMessage) {
+        for (PageObserver pageObserver :
+                pageObservers) {
+            pageObserver.newMessageAlert(chatMessage);
+        }
     }
     private void notifyConnectionObservers() {
         for (ConnectionObserver observer : connectionObservers) {

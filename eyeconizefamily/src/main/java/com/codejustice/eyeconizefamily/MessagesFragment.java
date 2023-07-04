@@ -18,9 +18,9 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.codejustice.entities.ChatMessage;
-import com.codejustice.entities.ChatMessageAbstract;
-import com.codejustice.entities.TimeShowingMessage;
+import NetService.ConnectionUtils.ChatMessage;
+import NetService.ConnectionUtils.ChatMessageAbstract;
+import NetService.ConnectionUtils.TimeShowingMessage;
 import com.codejustice.enums.MessageTypes;
 import com.codejustice.eyeconizefamily.databinding.FragmentMessagesBinding;
 import com.codejustice.global.Global;
@@ -132,6 +132,7 @@ public class MessagesFragment extends Fragment implements MessageObserver {
     }
 
     private void refreshContent(ChatMessage chatMessage){
+        messagesDbHelper.switchTable(Global.selfID, Global.receiverID);
         messages = messagesDbHelper.getChatMessages();
         int position = messages.size() - 1;
         chatContentAdapter.notifyDataSetChanged();
@@ -271,6 +272,7 @@ public class MessagesFragment extends Fragment implements MessageObserver {
                         if (interval < 200) {
                             // 双击事件处理
                             Intent intent = new Intent(MessageTypes.ACTION_GO_TO_SEND_MESSAGES);
+
                             requireContext().sendBroadcast(intent);
                             System.out.println("Broadcast sent.");
                         }

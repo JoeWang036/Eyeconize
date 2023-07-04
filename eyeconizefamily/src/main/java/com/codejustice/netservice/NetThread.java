@@ -8,6 +8,7 @@ import com.codejustice.enums.MessageTypes;
 import com.codejustice.global.Global;
 import com.codejustice.utils.db.MessagesDBHelper;
 
+import NetService.ConnectionUtils.ChatMessage;
 import NetService.ConnectionUtils.ConnectionManager;
 import NetService.ConnectionUtils.ConnectionObserver;
 import NetService.MessageProtocol.CommunicationMessage;
@@ -62,6 +63,8 @@ public class NetThread extends HandlerThread implements ConnectionObserver {
             } else if (message instanceof TextMessage) {
                 connectionManager.notifyMessageObserversGet((TextMessage) message);
                 Message msg = handler.obtainMessage(MessageTypes.HANDLER_NEW_MESSAGE);
+                ChatMessage chatMessage = new ChatMessage((TextMessage) message);
+                connectionManager.notifyPageObservers(chatMessage);
                 msg.obj = message;
                 handler.sendMessage(msg);
             } else if (message instanceof ConfirmMessage) {

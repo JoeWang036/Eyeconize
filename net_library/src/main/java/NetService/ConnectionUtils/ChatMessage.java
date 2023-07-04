@@ -1,4 +1,4 @@
-package com.codejustice.entities;
+package NetService.ConnectionUtils;
 
 import androidx.annotation.Nullable;
 

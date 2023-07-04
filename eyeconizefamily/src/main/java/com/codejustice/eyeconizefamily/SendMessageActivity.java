@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -17,16 +18,18 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.codejustice.entities.ChatMessage;
+import NetService.ConnectionUtils.ChatMessage;
+
+import com.codejustice.dialogs.AskAvailableDialog;
 import com.codejustice.enums.MessageTypes;
 import com.codejustice.global.Global;
 import com.codejustice.netservice.NetThread;
+import com.codejustice.utils.db.MessagesDBHelper;
 
 import NetService.ConnectionUtils.ConnectionManager;
-import NetService.MessageProtocol.TextMessage;
-import NetService.MessageProtocol.TextMessageCoder;
+import NetService.ConnectionUtils.PageObserver;
 
-public class SendMessageActivity extends AppCompatActivity {
+public class SendMessageActivity extends AppCompatActivity implements ReplierActivity, PageObserver {
 
 
     private final long MAX_CLICK_DURATION = 1000;
@@ -40,19 +43,22 @@ public class SendMessageActivity extends AppCompatActivity {
     private ConnectionManager connectionManager;
     private Button sendButton;
     private EditText sendContent;
-    private short messageSerial = 1;
     public FrameLayout FamilyStatusHead;
     private ImageButton goToMainButton;
     private TextView batteryView;
+
+    private MessagesDBHelper  messagesDBHelper;
     private TextView deviceStatusView;
     private TextView patientCurrentStatusView;
     private TextView patientLastStatusView;
+    Handler handler;
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        messagesDBHelper = MessagesDBHelper.getInstance(this);
         netThread = ((EyeconizeFamilyApplication)getApplication()).getNetThread();
         setContentView(R.layout.activity_send_messages_detailed);
         connectionManager = ConnectionManager.getInstance();
@@ -72,7 +78,8 @@ public class SendMessageActivity extends AppCompatActivity {
             startActivity(intent);
             finish();
         });
-
+        Global.messageSerial = messagesDBHelper.getLastSerial(Global.receiverID);
+        connectionManager.registerPageObserver(this);
 
 
         TextWatcher textWatcher = new TextWatcher() {
@@ -113,19 +120,7 @@ public class SendMessageActivity extends AppCompatActivity {
                         if (pressDuration < MAX_CLICK_DURATION && distance < MAX_CLICK_DISTANCE) {
                           //正常点击
                             String message = sendContent.getText().toString();
-                            if (!message.trim().equals("")) {
-                                System.out.println("connection manager id:");
-                                System.out.println(connectionManager.getSelfID());
-                                messageSerial++;
-                                messageSerial = (short)(messageSerial%50000);
-                                long sendTime = System.currentTimeMillis();
-                                messagesFragment.addMessage(new ChatMessage(message, Global.selfID, sendTime, messageSerial, ChatMessage.SENDING));
-
-                                new Thread(()->{
-                                    connectionManager.sendTextMessage(message, Global.receiverID, messageSerial, sendTime);
-                                }).start();
-                                sendContent.setText("");
-                            }
+                            sendMessage(message, Global.receiverID);
 
                         } else if (event.getY() < pressedY && distance > MIN_SWIPE_DISTANCE) {
                           //上滑
@@ -142,11 +137,31 @@ public class SendMessageActivity extends AppCompatActivity {
         };
         sendButton.setOnTouchListener(swipeListener);
 
+        handler = new Handler(Looper.getMainLooper()){
+            @Override
+            public void handleMessage(Message message) {
+                System.out.println("Message received.");
+                switch (message.what) {
+                    case MessageTypes.GO_TO_SEND_MESSAGES:
+
+                        break;
+                    case MessageTypes.HANDLER_NEW_MESSAGE:
+                        AskAvailableDialog askAvailableDialog = new AskAvailableDialog(SendMessageActivity.this, R.style.AskAvailableStyle, (ChatMessage) message.obj, connectionManager, SendMessageActivity.this);
+                        askAvailableDialog.show();
+                    default:
+                        break;
+
+                }
+            }
+        };
+
 
     }
     @Override
     public void onDestroy(){
         super.onDestroy();
+        connectionManager.unregisterPageObserver(this);
+
         System.out.println("main view destroyed.");
     }
 
@@ -154,7 +169,35 @@ public class SendMessageActivity extends AppCompatActivity {
     @Override
     protected void onStart(){
         super.onStart();
+        connectionManager.registerPageObserver(this);
+
 
     }
 
+    @Override
+    public void sendMessage(String content, long receiverID) {
+        if (!content.trim().equals("")) {
+            Global.receiverID = receiverID;
+            //TODO 完善页面跳转逻辑，当消息接收者不是当前接收者时改变显示内容
+
+            System.out.println("connection manager id:");
+            System.out.println(connectionManager.getSelfID());
+            Global.messageSerial++;
+            Global.messageSerial = (short)(Global.messageSerial%10000);
+            long sendTime = System.currentTimeMillis();
+
+            messagesFragment.addMessage(new ChatMessage(content, Global.selfID, sendTime, Global.messageSerial, ChatMessage.SENDING));
+
+            new Thread(()->{
+                connectionManager.sendTextMessage(content, receiverID, Global.messageSerial, sendTime);
+            }).start();
+            sendContent.setText("");
+        }
+    }
+
+    @Override
+    public void newMessageAlert(ChatMessage chatMessage) {
+        Message message = handler.obtainMessage(MessageTypes.HANDLER_NEW_MESSAGE, chatMessage);
+        handler.sendMessage(message);
+    }
 }

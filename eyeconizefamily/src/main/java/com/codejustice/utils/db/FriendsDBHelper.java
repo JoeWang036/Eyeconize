@@ -103,6 +103,7 @@ public class FriendsDBHelper extends SQLiteOpenHelper {
 
     public String getFriendNicknameByID(long friendID, long userID) {
         String nickname = null;
+        createNewTable(userID);
         currentDatabase = getWritableDatabase();
         Cursor cursor = currentDatabase.query(genTableName(userID), new String[]{NICKNAME_KEY},
                 ID_KEY + "=?", new String[]{String.valueOf(friendID)},
