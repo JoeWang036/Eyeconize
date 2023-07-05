@@ -69,6 +69,8 @@ public class FriendsDBHelper extends SQLiteOpenHelper {
 
     private void createNewTable(long userID) {
         currentDatabase = getWritableDatabase();
+//        String createTableQuery = "DROP TABLE IF EXISTS " + genTableName(userID) + ";";
+//        currentDatabase.execSQL(createTableQuery);
         String createTableQuery = "CREATE TABLE IF NOT EXISTS " + genTableName(userID) + " (id INTEGER primary key, nickName TEXT, phoneNumber TEXT, profilePic TEXT, lastProfileChangeTime INTEGER)";
         currentDatabase.execSQL(createTableQuery);
     }

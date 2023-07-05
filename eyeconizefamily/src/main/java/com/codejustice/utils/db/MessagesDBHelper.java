@@ -195,6 +195,32 @@ public void insertData(ChatMessage msg) {
             return null;
         }
     }
+    public ChatMessage findNewestMessage(long otherID) {
+
+        SQLiteDatabase db = getWritableDatabase();
+        String tableName = genTableName(Global.selfID, otherID);
+
+
+        String[] columns = {ID_KEY, CONTENT_KEY, TIME_KEY, SENT_KEY, SERIAL_KEY};
+
+        String orderBy = TIME_KEY + " DESC"; // 按照sendTime从大到小排序
+
+        Cursor cursor = db.query(tableName, columns, null, null, null, null, orderBy);
+
+        if (cursor.moveToFirst()) {
+            long senderID = cursor.getLong(cursor.getColumnIndexOrThrow(ID_KEY));
+            String content = cursor.getString(cursor.getColumnIndexOrThrow(CONTENT_KEY));
+            long time = cursor.getLong(cursor.getColumnIndexOrThrow(TIME_KEY));
+            byte sentStatus = (byte) cursor.getShort(cursor.getColumnIndexOrThrow(SENT_KEY));
+            short serial = cursor.getShort(cursor.getColumnIndexOrThrow(SERIAL_KEY));
+            ChatMessage updatedMessage = new ChatMessage(content, senderID, time, serial, sentStatus);
+            cursor.close();
+            return updatedMessage;
+        } else {
+            cursor.close();
+            return null;
+        }
+    }
 
     public void switchTable(long hostID, long otherID) {
         if (currentDatabase != null) {

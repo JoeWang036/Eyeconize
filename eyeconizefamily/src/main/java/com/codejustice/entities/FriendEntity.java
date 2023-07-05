@@ -2,11 +2,12 @@ package com.codejustice.entities;
 
 import android.media.Image;
 
-public class FriendEntity {
+public class FriendEntity implements Comparable{
     public long friendID;
 
     public String friendName;
     public String lastMessage = "";
+    public long lastMessageTime = 0;
     public String phoneNumber = "";
 
     public long lastChangeProfileTime = 0;
@@ -35,4 +36,11 @@ public class FriendEntity {
         this.friendID = friendID;
     }
 
+    @Override
+    public int compareTo(Object o) {
+        if (!(o instanceof FriendEntity)) {
+            return -1;
+        }
+        return -(int)(this.lastMessageTime-((FriendEntity) o).lastMessageTime);
+    }
 }

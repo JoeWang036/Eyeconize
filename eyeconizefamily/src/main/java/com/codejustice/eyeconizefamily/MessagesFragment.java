@@ -195,6 +195,12 @@ public class MessagesFragment extends Fragment implements MessageObserver {
 
         messages.add(message);
         messagesDbHelper.insertData(message);
+        if (mode == DUAL_MODE) {
+            Intent intent = new Intent(MessageTypes.ACTION_REFRESH_FAMILY_PICKER_CONTENT);
+            intent.putExtra(MessageTypes.INTENT_EXTRA_NEW_USER_ID, Global.receiverID);
+            requireContext().sendBroadcast(intent);
+        }
+
         int position = messages.size() - 1;
         chatContentAdapter.notifyItemInserted(position);
         chatView.scrollToPosition(position);

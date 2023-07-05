@@ -31,6 +31,7 @@ public class MainActivity extends AppCompatActivity implements PageObserver, Rep
     MessagesDBHelper messagesDBHelper;
 
     private MessagesFragment messagesFragment;
+    private PickPatientsFragment pickPatientsFragment;
 
     private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
@@ -51,7 +52,10 @@ public class MainActivity extends AppCompatActivity implements PageObserver, Rep
                 System.out.println("new ID: "+newID);
                 Global.receiverID = newID;
                 messagesFragment.refreshDatabase(newID);
+                pickPatientsFragment.refreshContent(newID);
+            } else if (intent.getAction().equals(MessageTypes.ACTION_REFRESH_FAMILY_PICKER_CONTENT)) {
 
+                pickPatientsFragment.refreshContent(intent.getLongExtra(MessageTypes.INTENT_EXTRA_NEW_USER_ID, 0));
             }
         }
     };
@@ -65,6 +69,8 @@ public class MainActivity extends AppCompatActivity implements PageObserver, Rep
         intentFilter = new IntentFilter(MessageTypes.ACTION_GO_TO_PICK_PATIENTS);
         registerReceiver(broadcastReceiver, intentFilter);
         intentFilter = new IntentFilter(MessageTypes.ACTION_ALTER_CHAT_CONTENTS);
+        registerReceiver(broadcastReceiver, intentFilter);
+        intentFilter = new IntentFilter(MessageTypes.ACTION_REFRESH_FAMILY_PICKER_CONTENT);
         registerReceiver(broadcastReceiver, intentFilter);
         connectionManager.registerPageObserver(this);
 
@@ -130,11 +136,13 @@ public class MainActivity extends AppCompatActivity implements PageObserver, Rep
                         break;
                     case MessageTypes.HANDLER_REFRESH_TABLE:
                         messagesFragment.refreshDatabase(Global.receiverID);
+                        pickPatientsFragment.refreshContent(Global.receiverID);
                         break;
                     case MessageTypes.HANDLER_SEND_REPLY_MESSAGE:
                         while (!Global.messagesToSend.isEmpty()){
                             TextMessage tm = Global.messagesToSend.get(0);
                             MainActivity.this.sendMessage(tm.getMessage(), Global.receiverID);
+                            pickPatientsFragment.refreshContent(Global.receiverID);
                             Global.messagesToSend.remove(0);
                         }
                         break;
@@ -150,8 +158,8 @@ public class MainActivity extends AppCompatActivity implements PageObserver, Rep
     @Override
     protected void onStart(){
         super.onStart();        // 替换 FamilyPickerFragment
-        PickPatientsFragment familyPickerFragment = new PickPatientsFragment(PickPatientsFragment.DUAL_MODE);
-        dualFragment.replaceFamilyPickerFragment(familyPickerFragment);
+        pickPatientsFragment = new PickPatientsFragment(PickPatientsFragment.DUAL_MODE);
+        dualFragment.replaceFamilyPickerFragment(pickPatientsFragment);
         // 替换 ChatFragment
 
          messagesFragment = new MessagesFragment(MessagesFragment.DUAL_MODE, this);

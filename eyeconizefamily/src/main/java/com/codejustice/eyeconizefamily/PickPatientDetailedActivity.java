@@ -71,6 +71,7 @@ public class PickPatientDetailedActivity extends AppCompatActivity implements Pa
                         Global.receiverID = ((ChatMessage) message.obj).senderID;
                         messagesDBHelper.switchTable(Global.selfID, Global.receiverID);
                         messagesDBHelper.insertData((ChatMessage) message.obj);
+                        pickPatientsFragment.refreshContent(Global.receiverID);
                         if (((ChatMessage) message.obj).needToReply) {
                             AskAvailableDialog askAvailableDialog =
                                     new AskAvailableDialog(PickPatientDetailedActivity.this,
