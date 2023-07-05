@@ -10,7 +10,6 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
@@ -41,7 +40,7 @@ public class SendMessageActivity extends AppCompatActivity implements ReplierAct
 
     private MessagesFragment messagesFragment;
     private ConnectionManager connectionManager;
-    private Button sendButton;
+    private ImageButton sendButton;
     private EditText sendContent;
     public FrameLayout FamilyStatusHead;
     private ImageButton goToMainButton;
@@ -52,6 +51,8 @@ public class SendMessageActivity extends AppCompatActivity implements ReplierAct
     private TextView patientCurrentStatusView;
     private TextView patientLastStatusView;
     Handler handler;
+    private boolean gonnaSendQuestion = false;
+
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
@@ -62,7 +63,7 @@ public class SendMessageActivity extends AppCompatActivity implements ReplierAct
         netThread = ((EyeconizeFamilyApplication)getApplication()).getNetThread();
         setContentView(R.layout.activity_send_messages_detailed);
         connectionManager = ConnectionManager.getInstance();
-        messagesFragment = new MessagesFragment(MessagesFragment.DETAILED_MODE);
+        messagesFragment = new MessagesFragment(MessagesFragment.DETAILED_MODE, this);
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.send_message_detailed_frame_layout, messagesFragment)
                 .commit();
@@ -82,20 +83,21 @@ public class SendMessageActivity extends AppCompatActivity implements ReplierAct
         connectionManager.registerPageObserver(this);
 
 
+        alterButtonStatus(false);
         TextWatcher textWatcher = new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                sendButton.setEnabled(!s.toString().trim().equals(""));
+                alterButtonStatus(!s.toString().trim().equals(""));
             }
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                sendButton.setEnabled(!s.toString().trim().equals(""));
+                alterButtonStatus(!s.toString().trim().equals(""));
             }
 
             @Override
             public void afterTextChanged(Editable s) {
-                sendButton.setEnabled(!s.toString().trim().equals(""));
+                alterButtonStatus(!s.toString().trim().equals(""));
             }
         };
         sendContent.addTextChangedListener(textWatcher);
@@ -120,10 +122,21 @@ public class SendMessageActivity extends AppCompatActivity implements ReplierAct
                         if (pressDuration < MAX_CLICK_DURATION && distance < MAX_CLICK_DISTANCE) {
                           //正常点击
                             String message = sendContent.getText().toString();
-                            sendMessage(message, Global.receiverID);
+                            if (gonnaSendQuestion) {
+                                sendQuestion(message, Global.receiverID);
+                            }else{
+                                sendMessage(message, Global.receiverID);
+                            }
 
-                        } else if (event.getY() < pressedY && distance > MIN_SWIPE_DISTANCE) {
-                          //上滑
+
+                        } else if (event.getX() < pressedX && Math.abs(event.getY()-pressedY)<MIN_SWIPE_DISTANCE/2 && distance > MIN_SWIPE_DISTANCE) {
+                            //左滑
+                            gonnaSendQuestion = false;
+                            alterButtonStatus();
+                        } else if (event.getX() > pressedX && Math.abs(event.getY()-pressedY)<MIN_SWIPE_DISTANCE/2 && distance > MIN_SWIPE_DISTANCE) {
+                            //左滑
+                            gonnaSendQuestion = true;
+                            alterButtonStatus();
                         }
                         break;
                 }
@@ -146,11 +159,15 @@ public class SendMessageActivity extends AppCompatActivity implements ReplierAct
 
                         break;
                     case MessageTypes.HANDLER_NEW_MESSAGE:
+                        if (((ChatMessage) message.obj).senderID != Global.receiverID) {
+                            Global.receiverID = ((ChatMessage) message.obj).senderID;
+                            messagesFragment.refreshDatabase(Global.receiverID);
+                        }
                         messagesFragment.getMessage((ChatMessage) message.obj);
-
-
-                        AskAvailableDialog askAvailableDialog = new AskAvailableDialog(SendMessageActivity.this, R.style.AskAvailableStyle, (ChatMessage) message.obj, connectionManager, SendMessageActivity.this);
-                        askAvailableDialog.show();
+                        if (((ChatMessage) message.obj).needToReply) {
+                            AskAvailableDialog askAvailableDialog = new AskAvailableDialog(SendMessageActivity.this, R.style.AskAvailableStyle, (ChatMessage) message.obj, connectionManager, SendMessageActivity.this);
+                            askAvailableDialog.show();
+                        }
                     default:
                         break;
 
@@ -200,10 +217,53 @@ public class SendMessageActivity extends AppCompatActivity implements ReplierAct
             sendContent.setText("");
         }
     }
+    public void sendQuestion(String content, long receiverID) {
+        if (!content.trim().equals("")) {
+            Global.receiverID = receiverID;
+            //TODO 完善页面跳转逻辑，当消息接收者不是当前接收者时改变显示内容
+            renewMessageSerial();
+
+            System.out.println("connection manager id:");
+            System.out.println(connectionManager.getSelfID());
+            Global.messageSerial++;
+            Global.messageSerial = (short)(Global.messageSerial%10000);
+            long sendTime = System.currentTimeMillis();
+
+            messagesFragment.addMessage(new ChatMessage(content, Global.selfID, sendTime, Global.messageSerial, ChatMessage.SENDING));
+
+            new Thread(()->{
+                connectionManager.sendQuestionMessage(content, receiverID, Global.messageSerial);
+            }).start();
+            sendContent.setText("");
+        }
+    }
 
     @Override
     public void newMessageAlert(ChatMessage chatMessage) {
         Message message = handler.obtainMessage(MessageTypes.HANDLER_NEW_MESSAGE, chatMessage);
         handler.sendMessage(message);
+    }
+
+    private void alterButtonStatus() {
+        alterButtonStatus(!sendContent.getText().toString().trim().equals(""));
+    }
+
+    private void alterButtonStatus(boolean activated) {
+        sendButton.setEnabled(activated);
+        if (gonnaSendQuestion) {
+            if (activated) {
+
+                sendButton.setBackgroundResource(R.drawable.send_button_question);
+            }else{
+                sendButton.setBackgroundResource(R.drawable.send_button_question_deactivated);
+            }
+        }
+        else{
+            if(activated){
+                sendButton.setBackgroundResource(R.drawable.send_button_normal);
+            }else{
+                sendButton.setBackgroundResource(R.drawable.send_button_normal_deactivated);
+            }
+        }
     }
 }

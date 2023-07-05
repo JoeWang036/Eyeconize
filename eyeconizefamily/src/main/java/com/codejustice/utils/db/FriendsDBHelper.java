@@ -68,9 +68,9 @@ public class FriendsDBHelper extends SQLiteOpenHelper {
     }
 
     private void createNewTable(long userID) {
-        SQLiteDatabase db = getWritableDatabase();
+        currentDatabase = getWritableDatabase();
         String createTableQuery = "CREATE TABLE IF NOT EXISTS " + genTableName(userID) + " (id INTEGER primary key, nickName TEXT, phoneNumber TEXT, profilePic TEXT, lastProfileChangeTime INTEGER)";
-        db.execSQL(createTableQuery);
+        currentDatabase.execSQL(createTableQuery);
     }
 
     private String genTableName(long userID) {
@@ -86,10 +86,11 @@ public class FriendsDBHelper extends SQLiteOpenHelper {
         values.put(PHONE_NUMBER_KEY, phoneNum);
         values.put(PROFILE_PIC_KEY, picLocation);
         values.put(LAST_CHANGE_KEY, picLastChangeTime);
-        currentDatabase.insert(currentTableName, null, values);
+        currentDatabase.insertWithOnConflict(currentTableName, null, values, SQLiteDatabase.CONFLICT_IGNORE);
     }
 
     public void insertData(FriendEntity friend) {
+        currentDatabase = getWritableDatabase();
 
         ContentValues values = new ContentValues();
         values.put(ID_KEY, friend.friendID);
@@ -97,7 +98,7 @@ public class FriendsDBHelper extends SQLiteOpenHelper {
         values.put(PHONE_NUMBER_KEY, friend.phoneNumber);
         values.put(PROFILE_PIC_KEY, friend.profilePicLocation);
         values.put(LAST_CHANGE_KEY, friend.lastChangeProfileTime);
-        currentDatabase.insert(currentTableName, null, values);
+        currentDatabase.insertWithOnConflict(currentTableName, null, values, SQLiteDatabase.CONFLICT_IGNORE);
 
     }
 

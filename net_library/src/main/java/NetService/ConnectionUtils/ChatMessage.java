@@ -17,6 +17,7 @@ public class ChatMessage extends ChatMessageAbstract{
     public long timestamp;  // 添加时间属性
 
     public boolean isQuestion = false;
+    public boolean needToReply = true;
     public ChatMessage(String messageContent, long senderID, long timestamp, short messageSerial, byte sentStatus) {
         this.messageContent = messageContent;
         this.senderID = senderID;
@@ -32,6 +33,7 @@ public class ChatMessage extends ChatMessageAbstract{
         this.messageSerial = textMessage.getMessageSerial();
         this.sentStatus = SENT;
         isQuestion = textMessage.isQuestion;
+        needToReply = textMessage.needToReply;
     }
     // 添加 getter 和 setter 方法（根据需要）
 

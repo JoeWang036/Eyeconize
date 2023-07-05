@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">Eyeconize Family</string>
     <string name="send">发送</string>
+    <string name="double_click_tip">双 击 以 进 入 详 情 页 面</string>
 </resources>

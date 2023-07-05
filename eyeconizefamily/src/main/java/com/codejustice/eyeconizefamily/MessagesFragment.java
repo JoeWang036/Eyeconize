@@ -1,6 +1,7 @@
 package com.codejustice.eyeconizefamily;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -54,8 +55,9 @@ public class MessagesFragment extends Fragment implements MessageObserver {
     private long lastClickedTime = 0;
     private long newestTime = 0;
     private FragmentMessagesBinding binding;
-    public MessagesFragment(int arg) {
+    public MessagesFragment(int arg, Context context) {
         mode = arg;
+        messagesDbHelper = MessagesDBHelper.getInstance(context);
     }
 
     // 在此处实现 onCreateView 方法
@@ -92,6 +94,11 @@ public class MessagesFragment extends Fragment implements MessageObserver {
                             System.out.println(failMessage.messageSerial);
                             System.out.println(failMessage.sendTime);
                             messagesDbHelper.updateSentStatusFail(failMessage.receiverID, failMessage.sendTime, failMessage.messageSerial);
+                            refreshContent();
+                            break;
+                        case MessageTypes.HANDLER_REFRESH_TABLE:
+
+                            messagesDbHelper.switchTable(Global.selfID, (long)(msg.obj));
                             refreshContent();
                         default:
                             break;
@@ -142,11 +149,11 @@ public class MessagesFragment extends Fragment implements MessageObserver {
     }
 
 
+
+
     public void refreshDatabase(long newID) {
-        messagesDbHelper.switchTable(Global.selfID, newID);
-        refreshContent();
-
-
+        Message msg = handler.obtainMessage(MessageTypes.HANDLER_REFRESH_TABLE, newID);
+        handler.sendMessage(msg);
     }
 
     private void refreshContent(){

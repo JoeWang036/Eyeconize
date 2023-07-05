@@ -61,8 +61,6 @@ public class NetThread extends HandlerThread implements ConnectionObserver {
             if (message == null) {
                 connectionManager.setConnected(false);
             } else if (message instanceof TextMessage) {
-                //TODO 删掉
-
                 Message msg = handler.obtainMessage(MessageTypes.HANDLER_NEW_MESSAGE);
                 ChatMessage chatMessage = new ChatMessage((TextMessage) message);
                 connectionManager.notifyPageObservers(chatMessage);

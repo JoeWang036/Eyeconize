@@ -124,7 +124,7 @@
         android:id="@+id/send_message_detailed_frame_layout"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginBottom="10dp"
+        android:layout_marginBottom="15dp"
         app:layout_constraintBottom_toTopOf="@+id/sendMessageEditText"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -148,16 +148,28 @@
         app:layout_constraintEnd_toStartOf="@+id/sendMessageButton"
         app:layout_constraintStart_toStartOf="parent" />
 
-    <Button
+    <ImageButton
         android:id="@+id/sendMessageButton"
-        android:layout_width="wrap_content"
+        android:layout_width="68dp"
         android:layout_height="35dp"
         android:layout_marginEnd="10dp"
-        android:backgroundTint="#57D99B"
+        android:background="@drawable/send_button_normal"
         android:insetTop="0dp"
         android:insetBottom="0dp"
-        android:text="@string/send"
+
         app:iconPadding="0dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/sendMessageEditText" />
+
+    <TextView
+        android:id="@+id/send_messag_tip_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="左右滑动按钮切换发送模式。当前模式：普通"
+        android:textColor="#919191"
+        android:textSize="11sp"
+        app:layout_constraintBottom_toTopOf="@+id/sendMessageEditText"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/send_message_detailed_frame_layout" />
 </androidx.constraintlayout.widget.ConstraintLayout>

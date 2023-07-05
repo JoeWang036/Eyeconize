@@ -35,7 +35,7 @@ public class TextMessageCoder implements Coder {
         }
         ByteBuffer bb = ByteBuffer.wrap(byteArray);
         byte type = bb.get();
-        if (type == CodeTypeHeader.TEXT_MESSAGE || type == CodeTypeHeader.SIMPLE_QUESTION_MESSAGE) {
+        if (CodeTypeHeader.belongsToTextMessage(type)) {
             short messageSerial = bb.getShort();
             long senderID = bb.getLong();
             long sendTime = bb.getLong();
@@ -44,6 +44,7 @@ public class TextMessageCoder implements Coder {
             String data = new String(dataBytes);
             TextMessage textMessage = new TextMessage(data, messageSerial, senderID, sendTime);
             textMessage.isQuestion = (type==CodeTypeHeader.SIMPLE_QUESTION_MESSAGE);
+            textMessage.needToReply = !(type == CodeTypeHeader.NO_NEED_TO_REPLY_MESSAGE);
             return textMessage;
         } else {
             return null;

@@ -220,8 +220,6 @@ public class ConnectionManager {
     //TODO: 后续需要修改交互逻辑，需要服务器返回确认信息才发送成功
     public short sendTextMessage(String textMessage, long receiverID, short sendSerial, long sendTime) {
 
-
-
         byte[] data = textMessageCoder.encode(textMessage,sendSerial, receiverID);
         textMessageCoder.setSenderID(selfID);
         if (!connected) {
@@ -245,10 +243,29 @@ public class ConnectionManager {
     }
     public short sendQuestionMessage(String textMessage, long receiverID, short sendSerial) {
 
-
-        sendSerial += 1;
-        sendSerial = (short) (sendSerial%(short) 50000);
         byte[] data = textMessageCoder.encode(CodeTypeHeader.SIMPLE_QUESTION_MESSAGE, textMessage,sendSerial, receiverID);
+        if (!connected) {
+            System.out.println("Connection manager 228: trying to connect.");
+            tryToConnect();
+        }
+        try {
+
+            transmissionManager.sendMessage(data, socket);
+
+            return sendSerial;
+        } catch (IOException e) {
+            setConnected(false);
+            tryToConnect();
+
+            return -1;
+        } catch (NullPointerException e) {
+            System.out.println("Socket is currently null, please try later.");
+            return -1;
+        }
+    }
+    public short sendNoNeedToReplyMessage(String textMessage, long receiverID, short sendSerial) {
+
+        byte[] data = textMessageCoder.encode(CodeTypeHeader.NO_NEED_TO_REPLY_MESSAGE, textMessage,sendSerial, receiverID);
         if (!connected) {
             System.out.println("Connection manager 228: trying to connect.");
             tryToConnect();

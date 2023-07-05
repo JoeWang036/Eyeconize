@@ -6,10 +6,10 @@ public class FriendEntity {
     public long friendID;
 
     public String friendName;
-    public String lastMessage;
-    public String phoneNumber;
+    public String lastMessage = "";
+    public String phoneNumber = "";
 
-    public long lastChangeProfileTime;
+    public long lastChangeProfileTime = 0;
 
     public String profilePicLocation = "";
     public FriendEntity(String friendName, String lastMessage, String profilePicLocation) {

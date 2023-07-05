@@ -67,12 +67,15 @@ public class MainActivity extends AppCompatActivity implements PageObserver, Rep
         intentFilter = new IntentFilter(MessageTypes.ACTION_ALTER_CHAT_CONTENTS);
         registerReceiver(broadcastReceiver, intentFilter);
         connectionManager.registerPageObserver(this);
+
+        Message msg = handler.obtainMessage(MessageTypes.HANDLER_REFRESH_TABLE, Global.receiverID);
+        handler.sendMessage(msg);
+
+
         if (Global.SEND_NEW_MESSAGE) {
-            while (!Global.messagesToSend.isEmpty()){
-                TextMessage tm = Global.messagesToSend.get(0);
-                sendMessage(tm.getMessage(), Global.receiverID);
-                Global.messagesToSend.remove(0);
-            }
+            Message message = handler.obtainMessage(MessageTypes.HANDLER_SEND_REPLY_MESSAGE);
+            handler.sendMessage(message);
+
         }
 
     }
@@ -114,11 +117,27 @@ public class MainActivity extends AppCompatActivity implements PageObserver, Rep
                         finish();
                         break;
                     case MessageTypes.HANDLER_NEW_MESSAGE:
-
+                        if (Global.receiverID != ((ChatMessage) (message.obj)).senderID) {
+                            Global.receiverID = ((ChatMessage)(message.obj)).senderID;
+                            messagesFragment.refreshDatabase(((ChatMessage)(message.obj)).senderID);
+                        }
 
                         messagesFragment.getMessage((ChatMessage) message.obj);
-                        AskAvailableDialog askAvailableDialog = new AskAvailableDialog(MainActivity.this, R.style.AskAvailableStyle, (ChatMessage) message.obj, connectionManager, MainActivity.this);
-                        askAvailableDialog.show();
+                        if (((ChatMessage) message.obj).needToReply) {
+                            AskAvailableDialog askAvailableDialog = new AskAvailableDialog(MainActivity.this, R.style.AskAvailableStyle, (ChatMessage) message.obj, connectionManager, MainActivity.this);
+                            askAvailableDialog.show();
+                        }
+                        break;
+                    case MessageTypes.HANDLER_REFRESH_TABLE:
+                        messagesFragment.refreshDatabase(Global.receiverID);
+                        break;
+                    case MessageTypes.HANDLER_SEND_REPLY_MESSAGE:
+                        while (!Global.messagesToSend.isEmpty()){
+                            TextMessage tm = Global.messagesToSend.get(0);
+                            MainActivity.this.sendMessage(tm.getMessage(), Global.receiverID);
+                            Global.messagesToSend.remove(0);
+                        }
+                        break;
                     default:
                         break;
 
@@ -135,16 +154,19 @@ public class MainActivity extends AppCompatActivity implements PageObserver, Rep
         dualFragment.replaceFamilyPickerFragment(familyPickerFragment);
         // 替换 ChatFragment
 
-         messagesFragment = new MessagesFragment(MessagesFragment.DUAL_MODE);
+         messagesFragment = new MessagesFragment(MessagesFragment.DUAL_MODE, this);
 
         dualFragment.replaceChatFragment(messagesFragment);
         connectionManager.registerPageObserver(this);
+
 
 
     }
 
     @Override
     public void newMessageAlert(ChatMessage chatMessage) {
+
+
         Message message = handler.obtainMessage(MessageTypes.HANDLER_NEW_MESSAGE, chatMessage);
         handler.sendMessage(message);
     }

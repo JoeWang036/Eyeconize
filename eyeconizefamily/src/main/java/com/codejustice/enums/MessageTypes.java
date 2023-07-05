@@ -7,6 +7,9 @@ public class MessageTypes {
     public static final int HANDLER_REQUEST_SEND_MESSAGE = 4;
     public static final int HANDLER_UPDATE_RECYCLER = 5;
     public static final int HANDLER_MESSAGE_FAIL = 6;
+    public static final int HANDLER_PICK_PATIENTS_RETURN_AND_SEND = 7;
+    public static final int HANDLER_REFRESH_TABLE = 9;
+    public static final int HANDLER_SEND_REPLY_MESSAGE = 10;
     public static final int GO_TO_SEND_MESSAGES = 0;
     public static final String INTENT_EXTRA_NEW_USER_ID = "new_user_id";
     public static final String ACTION_GO_TO_SEND_MESSAGES = "com.codeJustice.GO_TO_SEND_MESSAGES";

@@ -211,7 +211,7 @@ public void insertData(ChatMessage msg) {
         return currentDatabase.query(currentTableName, columns, null, null, null, null, orderBy);
     }
     public List<ChatMessageAbstract> getChatMessages(){
-//        switchTable(Global.selfID, Global.receiverID);
+        switchTable(Global.selfID, Global.receiverID);
         List<ChatMessageAbstract> result = new ArrayList<>();
         Cursor cursor = getCursor();
         if (cursor.moveToFirst()) {

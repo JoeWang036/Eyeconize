@@ -8,6 +8,7 @@ public class TextMessage extends CommunicationMessage{
 
     private long sendTime;
     public boolean isQuestion = false;
+    public boolean needToReply = true;
     public TextMessage(String message, short messageSerial, long senderID,long sendTime) {
         this.message = message;
         this.messageSerial = messageSerial;
