@@ -129,11 +129,11 @@ public class SendMessageActivity extends AppCompatActivity implements ReplierAct
                             }
 
 
-                        } else if (event.getX() < pressedX && Math.abs(event.getY()-pressedY)<MIN_SWIPE_DISTANCE/2 && distance > MIN_SWIPE_DISTANCE) {
+                        } else if (event.getX() < pressedX && Math.abs(event.getY()-pressedY)<MIN_SWIPE_DISTANCE*2 && distance > MIN_SWIPE_DISTANCE) {
                             //左滑
                             gonnaSendQuestion = false;
                             alterButtonStatus();
-                        } else if (event.getX() > pressedX && Math.abs(event.getY()-pressedY)<MIN_SWIPE_DISTANCE/2 && distance > MIN_SWIPE_DISTANCE) {
+                        } else if (event.getX() > pressedX && Math.abs(event.getY()-pressedY)<MIN_SWIPE_DISTANCE*2 && distance > MIN_SWIPE_DISTANCE) {
                             //左滑
                             gonnaSendQuestion = true;
                             alterButtonStatus();

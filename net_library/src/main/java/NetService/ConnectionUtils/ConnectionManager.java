@@ -296,6 +296,7 @@ public class ConnectionManager {
                 byte type = headerMessageCoder.determineType(res);
                 switch (type) {
                     case CodeTypeHeader.SIMPLE_QUESTION_MESSAGE:
+                    case CodeTypeHeader.NO_NEED_TO_REPLY_MESSAGE:
                     case CodeTypeHeader.TEXT_MESSAGE:
                         TextMessage textMessage = textMessageCoder.decode(res);
                         System.out.println("Getting message from:" + textMessage.getSenderID());
