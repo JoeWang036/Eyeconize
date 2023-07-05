@@ -1,13 +1,19 @@
 package com.whu.eyerecongize.bilnk;
 
 import android.app.Dialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Handler;
 import android.os.SystemClock;
+import android.provider.Settings;
 import android.view.Gravity;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
+
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.whu.eyerecongize.R;
 import com.whu.eyerecongize.views.BarButton;
@@ -17,8 +23,15 @@ import com.whu.eyerecongize.views.LongButton;
 import com.whu.eyerecongize.views.MessageDialog;
 import com.whu.eyerecongize.views.MyDialog;
 import com.whu.eyerecongize.views.changeDialog;
+import com.whu.eyerecongize.connect.Setting;
 
+import java.io.IOException;
 import java.util.ArrayList;
+
+import NetService.ConnectionUtils.ChatMessage;
+import NetService.ConnectionUtils.ConnectionManager;
+import NetService.MessageProtocol.CodeTypeHeader;
+
 
 public class PageDecode {
     ArrayList<BlinkType>code;
@@ -32,7 +45,7 @@ public class PageDecode {
 
     ImageEditText edit;
 
-    Context context;
+    public Context context;
 
     //维护对activity组件的引用，便于修改其值
     ArrayList<BigButton>bigButtons=null;//从左到右，从上到下
@@ -61,6 +74,15 @@ public class PageDecode {
     ImageView yes;
     ImageView no;
 
+    //通信相关
+    private ConnectionManager connectionManager;
+    private BroadcastReceiver myReceiver;
+    private LocalBroadcastManager broadcastManager;
+
+    private String sendingContent;//用于传递发送的信息，以便渲染页面
+
+    public String recivingcontent="";//用于在收到疑问消息后获取其内容，以便回复更人性化
+
 
 
 
@@ -85,9 +107,34 @@ public class PageDecode {
         this.yes=yes;
         this.no=no;
 
+
+
     }
 
-    public int parse(BlinkType myEnum,int nowpage,int lastpage4Three){
+    public void unRegis(){
+        broadcastManager.unregisterReceiver(myReceiver);
+    }
+
+    public void Regius(){
+        //通信处理
+        connectionManager = ConnectionManager.getInstance();
+        myReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context cont, Intent intent) {
+                short res= intent.getShortExtra("sending",(short) -1);
+                if(res!=-1){
+                    messageDialogHandler(context,sendingContent,true);
+                }else{
+                    messageDialogHandler(context,sendingContent,false);
+                }
+                sendingContent="";
+            }
+        };
+        broadcastManager = LocalBroadcastManager.getInstance(context);
+        broadcastManager.registerReceiver(myReceiver, new IntentFilter("messageRes"));
+    }
+
+    public int parse(BlinkType myEnum,int nowpage,int lastpage4Three,boolean isReceive){
         try {
             int tmp=0;
             //BlinkType myEnum = BlinkType.valueOf(message);
@@ -102,7 +149,7 @@ public class PageDecode {
                 code.clear();
                 lockStatus=false;
                 break;
-                case SPACE:tmp=decode4All(nowpage,lastpage4Three);
+                case SPACE:tmp=decode4All(nowpage,lastpage4Three,isReceive);
                 //System.out.println(tmp);
                 if(!codeString.equals("")){
                     codeString="";
@@ -140,6 +187,43 @@ public class PageDecode {
 //        lastTime=System.currentTimeMillis();
 //
 //    }
+
+
+    public void sendMessage(String content, long receiverID) {
+        if (!content.trim().equals("")) {
+            System.out.println("connection manager id:");
+            System.out.println(connectionManager.getSelfID());
+            Setting.messageSerial++;
+            Setting.messageSerial = (short)(Setting.messageSerial%10000);
+            long sendTime = System.currentTimeMillis();
+            sendingContent=content;
+            new Thread(()->{
+                short tmp=connectionManager.sendTextMessage(content, Setting.receiverID, Setting.messageSerial, sendTime);
+                LocalBroadcastManager broadcastManager = LocalBroadcastManager.getInstance(context);
+                Intent intent = new Intent("messageRes");
+                intent.putExtra("sending", tmp);
+                broadcastManager.sendBroadcast(intent);
+            }).start();
+        }
+    }
+
+    public void sendNoReplyMessage(String content, long receiverID) {
+        if (!content.trim().equals("")) {
+            System.out.println("connection manager id:");
+            System.out.println(connectionManager.getSelfID());
+            Setting.messageSerial++;
+            Setting.messageSerial = (short)(Setting.messageSerial%10000);
+            long sendTime = System.currentTimeMillis();
+            sendingContent=content;
+            new Thread(()->{
+                short tmp=connectionManager.sendNoNeedToReplyMessage(content, Setting.receiverID, Setting.messageSerial);
+                LocalBroadcastManager broadcastManager = LocalBroadcastManager.getInstance(context);
+                Intent intent = new Intent("messageRes");
+                intent.putExtra("sending", tmp);
+                broadcastManager.sendBroadcast(intent);
+            }).start();
+        }
+    }
 
     public void messageDialogHandler(Context context,String content,boolean status){
         MyDialog dialog =new MyDialog(context, R.style.MyDialogStyle,content,status);
@@ -244,8 +328,8 @@ public class PageDecode {
             tmp.invalidate();
             buttonHandler();
             //通讯逻辑
-
-            messageDialogHandler(context,"我需要喝水",status);
+            sendMessage("我需要喝水",Setting.receiverID);
+            //messageDialogHandler(context,"我需要喝水",status);
             clear();
 
         }
@@ -255,8 +339,8 @@ public class PageDecode {
             tmp.setRec(true);
             tmp.invalidate();
             buttonHandler();
-
-            messageDialogHandler(context,"我现在有些饿",status);
+            sendMessage("我现在有些饿",Setting.receiverID);
+            //messageDialogHandler(context,"我现在有些饿",status);
             clear();
         }
 
@@ -265,8 +349,8 @@ public class PageDecode {
             tmp.setRec(true);
             tmp.invalidate();
             buttonHandler();
-
-            messageDialogHandler(context,"我需要大便",status);
+            sendMessage("我需要大便",Setting.receiverID);
+            //messageDialogHandler(context,"我需要大便",status);
             clear();
         }
 
@@ -275,8 +359,8 @@ public class PageDecode {
             tmp.setRec(true);
             tmp.invalidate();
             buttonHandler();
-
-            messageDialogHandler(context,"我需要小便",status);
+            sendMessage("我需要小便",Setting.receiverID);
+            //messageDialogHandler(context,"我需要小便",status);
             clear();
         }
 
@@ -292,7 +376,8 @@ public class PageDecode {
                 }
             }, 1000);
 
-            messageDialogHandler(context,"我需要紧急帮助！",status);
+            sendMessage("我需要紧急帮助！",Setting.receiverID);
+            //messageDialogHandler(context,"我需要紧急帮助！",status);
             clear();
         }
 
@@ -307,8 +392,8 @@ public class PageDecode {
                 tmp.invalidate();
                 buttonHandler();
                 //通讯逻辑
-
-                messageDialogHandler(context, "请马上过来", status);
+                sendMessage("请马上过来",Setting.receiverID);
+                //messageDialogHandler(context, "请马上过来", status);
                 clear();
 
             }
@@ -462,11 +547,17 @@ public class PageDecode {
 
     }
 
+
+    private String recivingMesManager(){//用于处理收到的字符串，使回复更人性化
+        return "回复"+"“"+recivingcontent+"”"+":";
+    }
+
     public int pageMesDecode(){
         boolean status = true;//表示通信结果，不能为定值
         if(codeString.equals("000")){
             yes.setImageResource(R.drawable.yesactive);
-            messageDialogHandler(context, "好的", status);//此处发送消息
+            sendNoReplyMessage(recivingMesManager()+"好的",Setting.receiverID);
+            //messageDialogHandler(context, "好的", status);//此处发送消息
 
 
             Handler handler = new Handler();
@@ -482,7 +573,8 @@ public class PageDecode {
 
         if(codeString.equals("010")){
             no.setImageResource(R.drawable.noactive);
-            messageDialogHandler(context, "不用", status);//此处发送消息
+            sendNoReplyMessage(recivingMesManager()+"不用",Setting.receiverID);
+            //messageDialogHandler(context, "不用", status);//此处发送消息
 
 
             Handler handler = new Handler();
@@ -499,8 +591,20 @@ public class PageDecode {
         return 0;
     }
 
-    public int decode4All(int nowPage,int lastPage4Three){//4表示去常用，5表示工具，6表示其他,7针对消息页面，表示退出消息页面
-        if(nowPage==4){
+    public int dialogMesDecode(){//针对一般消息弹窗界面的译码
+        if(codeString.equals("10")){
+            clear();
+            return 8;
+        }
+        return 0;
+    }
+
+    public int decode4All(int nowPage,int lastPage4Three,boolean isReceive){//4表示去常用，5表示工具，6表示其他,7针对消息页面，表示退出消息页面
+        if(isReceive){//受到一般消息，执行其对应译码
+            return dialogMesDecode();
+        }
+
+        if(nowPage==4){//即当前受到询问消息，采用询问译码
             return pageMesDecode();
         }
 

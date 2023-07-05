@@ -51,7 +51,7 @@ public class MyDialog extends Dialog {
             resImg.setImageResource(R.drawable.passtive);
             res.setText("发送失败");
         }
-        content.setText("已发送消息："+contentStr);
+        content.setText("发送消息："+contentStr);
 
     }
 

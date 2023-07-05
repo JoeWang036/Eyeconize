@@ -178,7 +178,7 @@ public class LensEngine {
             } catch (InterruptedException e) {
                 Log.d(LensEngine.TAG, "Frame transacting thread interrupted on release.");
             }
-            this.transactingThread = null;
+            //this.transactingThread = null;
         }
         if (this.camera != null) {
             this.camera.stopPreview();
@@ -260,8 +260,7 @@ public class LensEngine {
         @SuppressLint("Assert")
         void release() {
             synchronized (this.lock) {
-                assert (LensEngine.this.transactingThread.getState() == State.TERMINATED);
-            }
+                assert (LensEngine.this.transactingThread.getState() == State.TERMINATED);}
         }
 
         void setActive(boolean active) {
