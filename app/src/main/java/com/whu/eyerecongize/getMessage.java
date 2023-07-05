@@ -13,9 +13,13 @@ import android.hardware.Camera;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.text.format.DateFormat;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -25,17 +29,30 @@ import com.whu.eyerecongize.bilnk.PageDecode;
 import com.whu.eyerecongize.camera.CameraConfiguration;
 import com.whu.eyerecongize.camera.LensEngine;
 import com.whu.eyerecongize.camera.LensEnginePreview;
+import com.whu.eyerecongize.connect.ActivitiesStack;
+import com.whu.eyerecongize.connect.MessageTypes;
+import com.whu.eyerecongize.connect.NetThread;
+import com.whu.eyerecongize.connect.Setting;
 import com.whu.eyerecongize.transactor.LocalFaceTransactor;
 import com.whu.eyerecongize.views.BarButton;
 import com.whu.eyerecongize.views.BigButton;
 import com.whu.eyerecongize.views.ImageEditText;
 import com.whu.eyerecongize.views.LongButton;
+import com.whu.eyerecongize.views.ReceiveMesDialog;
 import com.whu.eyerecongize.views.overlay.GraphicOverlay;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Stack;
 
-public class getMessage extends AppCompatActivity {
+import NetService.ConnectionUtils.ChatMessage;
+import NetService.ConnectionUtils.ConnectionManager;
+import NetService.ConnectionUtils.PageObserver;
+
+public class getMessage extends AppCompatActivity implements PageObserver {
 
     private static final String TAG = "FaceDetectionActivity";
     private static final String OPEN_STATUS = "open_status";
@@ -67,12 +84,70 @@ public class getMessage extends AppCompatActivity {
 
     ImageEditText edit;
 
+    Map<Long,String>friends;//维护一个联系人map，根据id查找对应的联系人，用以进行页面渲染，目前写死，后续考虑从数据库取
+
+    //通信相关
+    private ConnectionManager connectionManager;
+    Handler handler;
+
+    private boolean handlerEnabled = false;
+
+    private NetThread netThread;
+
+    ReceiveMesDialog dialog;//接收消息弹窗相关
+    boolean isReceive;
+    Stack<ReceiveMesDialog>dialogs;//消息栈，处理多个消息
+
+    String tmp;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_get_message);
 
+        ActivitiesStack.activities.push(this);
+
         setStatusBar();
+
+        //注册通信对象
+        netThread = ((EyeconizeApplication)getApplication()).getNetThread();
+        connectionManager = ConnectionManager.getInstance();
+        connectionManager.registerPageObserver(this);
+        //注册handler处理接收消息
+        handler = new Handler(Looper.getMainLooper()){
+            @Override
+            public void handleMessage(Message message) {
+                System.out.println("Message received.");
+                switch (message.what) {
+                    case MessageTypes.HANDLER_NEW_MESSAGE:
+                        ChatMessage cm = (ChatMessage) message.obj;
+                        if(cm.isQuestion){
+                            Intent intent = new Intent(getMessage.this, getMessage.class);
+
+                            intent.putExtra("ID", cm.senderID);
+                            intent.putExtra("content", cm.messageContent);
+
+                            startActivity(intent);
+                        }else{
+                            dialog =new ReceiveMesDialog(getMessage.this, R.style.MyDialogStyle,cm.messageContent,cm.senderID);
+                            WindowManager.LayoutParams localLayoutParams = dialog.getWindow().getAttributes();
+                            localLayoutParams.gravity = Gravity.LEFT|Gravity.TOP;
+                            localLayoutParams.x = 100;
+                            localLayoutParams.y=  10;
+                            dialog.getWindow().setAttributes(localLayoutParams);
+                            dialogs.push(dialog);
+                            dialog.show();
+                            isReceive=true;
+                        }
+                    default:
+                        break;
+
+                }
+            }
+        };
+
+        isReceive=false;
+        dialogs=new Stack<ReceiveMesDialog>();
 
         yes=findViewById(R.id.imageViewyes);
         no=findViewById(R.id.imageViewno);
@@ -100,6 +175,32 @@ public class getMessage extends AppCompatActivity {
         this.setStatusBar();
 
         setTime();
+        initialFriends();
+
+        //页面渲染
+        Intent intent = getIntent();
+        if (intent != null) {
+            tmp=intent.getStringExtra("content");
+            decoder.recivingcontent=tmp;
+            content.setText(intent.getStringExtra("content"));
+            long id = intent.getLongExtra("ID", (long)-1);
+            if(id!=-1){
+                String name=friends.get(id);
+                people.setText("来自"+name);
+            }
+
+        }
+    }
+
+    private void initialFriends(){
+        friends=new HashMap<Long,String>();
+        friends.put(Setting.receiverID,"儿子");
+    }
+
+    @Override
+    public void newMessageAlert(ChatMessage chatMessage) {
+        Message message = handler.obtainMessage(MessageTypes.HANDLER_NEW_MESSAGE, chatMessage);
+        handler.sendMessage(message);
     }
 
     private void setStatusBar() {
@@ -122,13 +223,16 @@ public class getMessage extends AppCompatActivity {
             public void onReceive(Context context, Intent intent) {
                 BlinkType enumValue = (BlinkType) intent.getSerializableExtra("newCode");
                 //译码逻辑
-                int index=decoder.parse(enumValue,4,0);
+                decoder.context=getMessage.this;
+                int index=decoder.parse(enumValue,4,0,isReceive);
                 setTime();
                 changePage(index);
             }
         };
         broadcastManager = LocalBroadcastManager.getInstance(this);
         broadcastManager.registerReceiver(myReceiver, new IntentFilter("code"));
+
+        decoder.Regius();
     }
 
     private void setTime(){
@@ -201,10 +305,29 @@ public class getMessage extends AppCompatActivity {
                 handler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                       finish();
+                       ActivitiesStack.activities.pop().finish();
+                        System.out.println("我关闭了一个页面，这个页面发送的消息是"+tmp);
                     }
                 }, 2000);
 
+                break;
+            case 8:
+                if(!dialogs.empty()){
+                    dialog=dialogs.pop();
+                    dialog.changeStatus();
+                    Handler handler2 = new Handler();
+                    handler2.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (dialog.isShowing()) {
+                                dialog.dismiss();
+                            }
+                        }
+                    }, 2000); // 延时2秒关闭弹窗
+                }
+                if(dialogs.empty()){
+                    isReceive=false;
+                }
                 break;
 
         }
@@ -214,6 +337,8 @@ public class getMessage extends AppCompatActivity {
     public void onResume() {
         super.onResume();
         this.startLensEngine();
+        connectionManager.registerPageObserver(this);
+        System.out.println("现在加载的页面是"+tmp);
     }
 
     @Override
@@ -221,16 +346,21 @@ public class getMessage extends AppCompatActivity {
         super.onStop();
         this.preview.stop();
         broadcastManager.unregisterReceiver(myReceiver);
+        connectionManager.unregisterPageObserver(this);
+        System.out.println("现在停止的页面是"+tmp);
+        decoder.unRegis();
     }
 
     @Override
     public void onBackPressed() {
         super.onBackPressed();
         releaseLensEngine();
+        connectionManager.unregisterPageObserver(this);
     }
 
     private void releaseLensEngine() {
         if (this.lensEngine != null) {
+            System.out.println("现在释放页面"+tmp+"的引擎");
             this.lensEngine.release();
             this.lensEngine = null;
         }
@@ -238,6 +368,7 @@ public class getMessage extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
+        System.out.println("现在销毁的页面是"+tmp);
         super.onDestroy();
         releaseLensEngine();
     }
