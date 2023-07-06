@@ -101,8 +101,11 @@ public class PickPatientsFragment extends Fragment {
         for (FriendEntity friend :
                 myFamilyList) {
             ChatMessage latestChatMessage = messagesDBHelper.findNewestMessage(friend.friendID);
-            friend.lastMessage = latestChatMessage.messageContent;
-            friend.lastMessageTime = latestChatMessage.timestamp;
+            if (latestChatMessage != null) {
+
+                friend.lastMessage = latestChatMessage.messageContent;
+                friend.lastMessageTime = latestChatMessage.timestamp;
+            }
         }
 
         refreshContent();
@@ -116,10 +119,12 @@ public class PickPatientsFragment extends Fragment {
         if (pos >= 0) {
             System.out.println("refreshing in process.");
             ChatMessage latestChatMessage = messagesDBHelper.findNewestMessage(familyID);
-            myFamilyList.get(pos).lastMessage = latestChatMessage.messageContent;
-            System.out.println(latestChatMessage.messageContent);
-            System.out.println("refreshing: content: "+latestChatMessage.messageContent);
-            myFamilyList.get(pos).lastMessageTime = latestChatMessage.timestamp;
+            if (latestChatMessage != null) {
+                myFamilyList.get(pos).lastMessage = latestChatMessage.messageContent;
+                System.out.println(latestChatMessage.messageContent);
+                System.out.println("refreshing: content: "+latestChatMessage.messageContent);
+                myFamilyList.get(pos).lastMessageTime = latestChatMessage.timestamp;
+            }
         }
 
         System.out.println("refreshing done.");

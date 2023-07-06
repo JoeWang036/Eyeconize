@@ -125,8 +125,9 @@ public class ConnectionManager {
     }
 
     public void notifyPageObservers(ChatMessage chatMessage) {
-
+        if (pageObserver != null) {
             pageObserver.newMessageAlert(chatMessage);
+        }
     }
     private void notifyConnectionObservers() {
         for (ConnectionObserver observer : connectionObservers) {

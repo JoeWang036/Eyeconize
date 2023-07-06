@@ -5,6 +5,10 @@
     <string name="app_name">Eyeconize Family</string>
     <string name="double_click_tip">双 击 以 进 入 详 情 页 面</string>
     <string name="send">发送</string>
+    <style name="AppTheme.Transparent" parent="Theme.AppCompat.Light">
+        
+        <item name="android:windowBackground">@android:color/transparent</item>
+    </style>
     <style name="AskAvailableStyle">
         <item name="android:windowBackground">@android:color/transparent</item>
         <item name="android:windowFrame">@null</item>

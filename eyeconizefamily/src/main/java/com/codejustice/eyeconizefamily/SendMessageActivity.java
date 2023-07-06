@@ -11,7 +11,6 @@ import android.text.TextWatcher;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
@@ -22,7 +21,7 @@ import NetService.ConnectionUtils.ChatMessage;
 import com.codejustice.dialogs.AskAvailableDialog;
 import com.codejustice.enums.MessageTypes;
 import com.codejustice.global.Global;
-import com.codejustice.netservice.NetThread;
+import com.codejustice.services.NetThread;
 import com.codejustice.utils.db.FriendsDBHelper;
 import com.codejustice.utils.db.MessagesDBHelper;
 
@@ -205,6 +204,26 @@ public class SendMessageActivity extends AppCompatActivity implements ReplierAct
     }
 
     @Override
+    protected void onResume(){
+        super.onResume();
+        ((EyeconizeFamilyApplication)getApplication()).setInForeground(true);
+        connectionManager.registerPageObserver(this);
+
+    }
+
+
+    @Override
+    protected void onPause(){
+        super.onPause();
+        System.out.println("pausing...");
+        ((EyeconizeFamilyApplication)getApplication()).setInForeground(false);
+        connectionManager.unregisterPageObserver(this);
+
+
+    }
+
+
+    @Override
     public void sendMessage(String content, long receiverID) {
         if (!content.trim().equals("")) {
             Global.receiverID = receiverID;
@@ -217,7 +236,7 @@ public class SendMessageActivity extends AppCompatActivity implements ReplierAct
             Global.messageSerial = (short)(Global.messageSerial%10000);
             long sendTime = System.currentTimeMillis();
 
-            messagesFragment.addMessage(new ChatMessage(content, Global.selfID, sendTime, Global.messageSerial, ChatMessage.SENDING));
+            messagesFragment.addMessageAndRenewDatabase(new ChatMessage(content, Global.selfID, sendTime, Global.messageSerial, ChatMessage.SENDING));
 
             new Thread(()->{
                 connectionManager.sendTextMessage(content, receiverID, Global.messageSerial, sendTime);
@@ -237,7 +256,7 @@ public class SendMessageActivity extends AppCompatActivity implements ReplierAct
             Global.messageSerial = (short)(Global.messageSerial%10000);
             long sendTime = System.currentTimeMillis();
 
-            messagesFragment.addMessage(new ChatMessage(content, Global.selfID, sendTime, Global.messageSerial, ChatMessage.SENDING));
+            messagesFragment.addMessageAndRenewDatabase(new ChatMessage(content, Global.selfID, sendTime, Global.messageSerial, ChatMessage.SENDING));
 
             new Thread(()->{
                 connectionManager.sendQuestionMessage(content, receiverID, Global.messageSerial);

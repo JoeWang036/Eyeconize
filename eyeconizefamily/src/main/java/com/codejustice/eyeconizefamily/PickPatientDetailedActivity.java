@@ -70,7 +70,7 @@ public class PickPatientDetailedActivity extends AppCompatActivity implements Pa
                     case MessageTypes.HANDLER_NEW_MESSAGE:
                         Global.receiverID = ((ChatMessage) message.obj).senderID;
                         messagesDBHelper.switchTable(Global.selfID, Global.receiverID);
-                        messagesDBHelper.insertData((ChatMessage) message.obj);
+//                        messagesDBHelper.insertData((ChatMessage) message.obj);
                         pickPatientsFragment.refreshContent(Global.receiverID);
                         if (((ChatMessage) message.obj).needToReply) {
                             AskAvailableDialog askAvailableDialog =
@@ -117,6 +117,8 @@ public class PickPatientDetailedActivity extends AppCompatActivity implements Pa
         registerReceiver(broadcastReceiver, intentFilter);
         connectionManager.registerPageObserver(this);
         messagesDBHelper = MessagesDBHelper.getInstance(this);
+        ((EyeconizeFamilyApplication)getApplication()).setInForeground(true);
+
 
     }
 
@@ -126,6 +128,9 @@ public class PickPatientDetailedActivity extends AppCompatActivity implements Pa
         // 取消注册广播接收器
         unregisterReceiver(broadcastReceiver);
         connectionManager.unregisterPageObserver(this);
+        System.out.println("pausing...");
+        ((EyeconizeFamilyApplication)getApplication()).setInForeground(false);
+
 
     }
 

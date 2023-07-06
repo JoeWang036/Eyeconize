@@ -33,7 +33,6 @@ import java.util.List;
 import NetService.ConnectionUtils.ConnectionManager;
 import NetService.ConnectionUtils.MessageObserver;
 import NetService.MessageProtocol.ConfirmMessage;
-import NetService.MessageProtocol.TextMessage;
 
 public class MessagesFragment extends Fragment implements MessageObserver {
 
@@ -80,7 +79,7 @@ public class MessagesFragment extends Fragment implements MessageObserver {
                             ChatMessage cm = (ChatMessage) msg.obj;
                             System.out.println("adding...");
                             System.out.println(mode);
-                            addMessage(cm);
+                            addMessageWithoutRenewingDatabase(cm);
                             break;
                         case MessageTypes.HANDLER_DONE_INITIALIZATION:
                             break;
@@ -186,7 +185,26 @@ public class MessagesFragment extends Fragment implements MessageObserver {
     }
 
 
-    public void addMessage(ChatMessage message) {
+    public void addMessageWithoutRenewingDatabase(ChatMessage message) {
+
+        if (message.timestamp - newestTime > 30000) {
+            messages.add(new TimeShowingMessage(message.timestamp));
+        }
+        newestTime = message.timestamp;
+        System.out.println("adding message.....");
+
+        messages.add(message);
+        if (mode == DUAL_MODE) {
+            Intent intent = new Intent(MessageTypes.ACTION_REFRESH_FAMILY_PICKER_CONTENT);
+            intent.putExtra(MessageTypes.INTENT_EXTRA_NEW_USER_ID, Global.receiverID);
+            requireContext().sendBroadcast(intent);
+        }
+
+        int position = messages.size() - 1;
+        chatContentAdapter.notifyItemInserted(position);
+        chatView.scrollToPosition(position);
+    }
+    public void addMessageAndRenewDatabase(ChatMessage message) {
 
         if (message.timestamp - newestTime > 30000) {
             messages.add(new TimeShowingMessage(message.timestamp));
