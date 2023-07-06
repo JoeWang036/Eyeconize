@@ -2,22 +2,33 @@ package com.codejustice.eyeconizefamily;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.graphics.RectF;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import NetService.ConnectionUtils.ChatMessage;
 
+import com.app.hubert.guide.NewbieGuide;
+import com.app.hubert.guide.core.Controller;
+import com.app.hubert.guide.listener.OnGuideChangedListener;
+import com.app.hubert.guide.listener.OnLayoutInflatedListener;
+import com.app.hubert.guide.listener.OnPageChangedListener;
+import com.app.hubert.guide.model.GuidePage;
+import com.app.hubert.guide.model.HighLight;
+import com.app.hubert.guide.model.RelativeGuide;
 import com.codejustice.dialogs.AskAvailableDialog;
 import com.codejustice.enums.MessageTypes;
 import com.codejustice.global.Global;
@@ -182,6 +193,7 @@ public class SendMessageActivity extends AppCompatActivity implements ReplierAct
             }
         };
 
+        initTeaching();
 
     }
     @Override
@@ -193,6 +205,127 @@ public class SendMessageActivity extends AppCompatActivity implements ReplierAct
     }
     private void renewMessageSerial(){
         Global.messageSerial = messagesDBHelper.getLastSerial(Global.receiverID);
+    }
+
+    public void initTeaching(){
+        NewbieGuide.with(SendMessageActivity.this)
+                .setLabel("teachMessage")
+                .alwaysShow(true)//总是显示，调试时可以打开
+                .setOnGuideChangedListener(new OnGuideChangedListener() {
+                    @Override
+                    public void onShowed(Controller controller) {
+
+                    }
+
+                    @Override
+                    public void onRemoved(Controller controller) {
+                        finish();
+                    }
+                })
+                .setOnPageChangedListener(new OnPageChangedListener() {
+                    @Override
+                    public void onPageChanged(int page) {
+                        if(page==3){
+                            gonnaSendQuestion=true;
+                            alterButtonStatus();
+                        }
+                        if(page==5){
+                            gonnaSendQuestion=false;
+                            alterButtonStatus();
+                        }
+                    }
+                })
+                .addGuidePage(//第一页
+                        GuidePage.newInstance()//创建一个实例
+                                .setLayoutRes(R.layout.inst_page)//设置引导页布局
+                                .setOnLayoutInflatedListener(new OnLayoutInflatedListener() {
+                                    @Override
+                                    public void onLayoutInflated(View view, Controller controller) {
+                                        //引导页布局填充后回调，用于初始化
+                                        ImageView ig = view.findViewById(R.id.imageViewinst);
+                                        ig.setImageResource(R.drawable.inst5);
+                                    }
+                                })
+                                .setBackgroundColor(0xd9D7D7D7)
+                )
+                .addGuidePage(//第二页
+                        GuidePage.newInstance()//创建一个实例
+                                .setLayoutRes(R.layout.inst_page)//设置引导页布局
+                                .setOnLayoutInflatedListener(new OnLayoutInflatedListener() {
+                                    @Override
+                                    public void onLayoutInflated(View view, Controller controller) {
+                                        //引导页布局填充后回调，用于初始化
+                                        ImageView ig = view.findViewById(R.id.imageViewinst);
+                                        ig.setImageResource(R.drawable.inst6);
+                                    }
+                                })
+                                .setBackgroundColor(0xd9D7D7D7)
+                )
+                .addGuidePage(//第三页
+                        GuidePage.newInstance()//创建一个实例
+                                .setLayoutRes(R.layout.inst_but)//设置引导页布局
+                                .addHighLight(sendButton, HighLight.Shape.RECTANGLE,20)
+                                .setOnLayoutInflatedListener(new OnLayoutInflatedListener() {
+                                    @Override
+                                    public void onLayoutInflated(View view, Controller controller) {
+                                        //引导页布局填充后回调，用于初始化
+                                        ImageView ig = view.findViewById(R.id.imageViewbut);
+                                        ig.setImageResource(R.drawable.inst7);
+                                    }
+                                })
+                                .setBackgroundColor(0xd9D7D7D7)
+                )
+                .addGuidePage(//第四页
+                        GuidePage.newInstance()//创建一个实例
+                                .setLayoutRes(R.layout.inst_but)//设置引导页布局
+                                .addHighLight(sendButton, HighLight.Shape.RECTANGLE,20)
+                                .setOnLayoutInflatedListener(new OnLayoutInflatedListener() {
+                                    @Override
+                                    public void onLayoutInflated(View view, Controller controller) {
+                                        //引导页布局填充后回调，用于初始化
+                                        ImageView ig = view.findViewById(R.id.imageViewbut);
+                                        ig.setImageResource(R.drawable.inst8);
+                                    }
+                                })
+                                .setBackgroundColor(0xd9D7D7D7)
+                )
+                .addGuidePage(//第五页
+                        GuidePage.newInstance()//创建一个实例
+                                .setLayoutRes(R.layout.inst_but)//设置引导页布局
+                                .addHighLight(sendButton, HighLight.Shape.RECTANGLE,20)
+                                .setOnLayoutInflatedListener(new OnLayoutInflatedListener() {
+                                    @Override
+                                    public void onLayoutInflated(View view, Controller controller) {
+                                        //引导页布局填充后回调，用于初始化
+                                        ImageView ig = view.findViewById(R.id.imageViewbut);
+                                        ig.setImageResource(R.drawable.inst9);
+                                    }
+                                })
+                                .setBackgroundColor(0xd9D7D7D7)
+                )
+                .addGuidePage(//第六页
+                        GuidePage.newInstance()//创建一个实例
+                                .setLayoutRes(R.layout.inst_back)//设置引导页布局
+                                .addHighLight(goToMainButton, HighLight.Shape.CIRCLE,30)
+                                .setOnLayoutInflatedListener(new OnLayoutInflatedListener() {
+                                    @Override
+                                    public void onLayoutInflated(View view, Controller controller) {
+                                        //引导页布局填充后回调，用于初始化
+                                        ImageView ig = view.findViewById(R.id.imageViewback);
+                                        ig.setImageResource(R.drawable.inst10);
+                                    }
+                                })
+                                .setBackgroundColor(0xd9D7D7D7)
+                )
+                .addGuidePage(//第七页
+                        GuidePage.newInstance()
+                                .addHighLight(new RectF(10, 0, 1060, 200), HighLight.Shape.RECTANGLE,20,
+                                        new RelativeGuide(R.layout.inst_low2,
+                                                Gravity.BOTTOM, 10))
+                                .setBackgroundColor(0xd9D7D7D7)
+                )
+                .show();
+
     }
 
     @Override

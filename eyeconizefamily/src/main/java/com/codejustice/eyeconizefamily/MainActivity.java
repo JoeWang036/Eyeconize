@@ -1,16 +1,30 @@
 package com.codejustice.eyeconizefamily;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
+import android.graphics.RectF;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.view.Gravity;
+import android.view.View;
+import android.widget.ImageView;
 
+import com.app.hubert.guide.NewbieGuide;
+import com.app.hubert.guide.core.Controller;
+import com.app.hubert.guide.listener.OnGuideChangedListener;
+import com.app.hubert.guide.listener.OnLayoutInflatedListener;
+import com.app.hubert.guide.listener.OnPageChangedListener;
+import com.app.hubert.guide.model.GuidePage;
+import com.app.hubert.guide.model.HighLight;
+import com.app.hubert.guide.model.RelativeGuide;
 import com.codejustice.dialogs.AskAvailableDialog;
 import com.codejustice.enums.MessageTypes;
 import com.codejustice.global.Global;
@@ -114,6 +128,61 @@ public class MainActivity extends AppCompatActivity implements PageObserver, Rep
             }
         };
 
+        initTeaching();
+    }
+
+    public void initTeaching(){
+        NewbieGuide.with(MainActivity.this)
+                .setLabel("teach")
+                .alwaysShow(true)//总是显示，调试时可以打开
+                .setOnGuideChangedListener(new OnGuideChangedListener() {
+                    @Override
+                    public void onShowed(Controller controller) {
+
+                    }
+
+                    @Override
+                    public void onRemoved(Controller controller) {
+                        Intent sendMessagesIntent = new Intent(MainActivity.this, SendMessageActivity.class);
+                        startActivity(sendMessagesIntent);
+                    }
+                })
+                .addGuidePage(//第一页
+                        GuidePage.newInstance()//创建一个实例
+                                .setLayoutRes(R.layout.inst_page)//设置引导页布局
+                                .setOnLayoutInflatedListener(new OnLayoutInflatedListener() {
+                                    @Override
+                                    public void onLayoutInflated(View view, Controller controller) {
+                                        //引导页布局填充后回调，用于初始化
+                                        ImageView ig = view.findViewById(R.id.imageViewinst);
+                                        ig.setImageResource(R.drawable.inst1);
+                                    }
+                                })
+                        .setBackgroundColor(0xd9D7D7D7)
+                )
+                .addGuidePage(
+                        GuidePage.newInstance()
+                                .addHighLight(new RectF(10, 10, 1060, 800), HighLight.Shape.RECTANGLE,20,
+                                        new RelativeGuide(R.layout.inst_low,
+                                                Gravity.BOTTOM, 10))
+                                .setBackgroundColor(0xd9D7D7D7)
+                )
+                .addGuidePage(
+                        GuidePage.newInstance()
+                                .addHighLight(new RectF(10, 10, 1060, 800), HighLight.Shape.RECTANGLE,20,
+                                        new RelativeGuide(R.layout.inst_low1,
+                                                Gravity.BOTTOM, 10))
+                                .setBackgroundColor(0xd9D7D7D7)
+                )
+                .addGuidePage(
+                        GuidePage.newInstance()
+                                .addHighLight(new RectF(10, 800, 1060, 1710), HighLight.Shape.RECTANGLE,20,
+                                        new RelativeGuide(R.layout.inst_high,
+                                                Gravity.TOP, 10))
+                                .setBackgroundColor(0xd9D7D7D7)
+                )
+
+                .show();
 
     }
     @Override

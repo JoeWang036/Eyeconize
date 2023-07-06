@@ -97,6 +97,8 @@ public class PickPatientDetailedActivity extends AppCompatActivity implements Pa
     }
 
 
+
+
     @Override
     protected void onStart(){
         super.onStart();
