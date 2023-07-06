@@ -25,6 +25,7 @@ import NetService.ConnectionUtils.TimeShowingMessage;
 import com.codejustice.enums.MessageTypes;
 import com.codejustice.eyeconizefamily.databinding.FragmentMessagesBinding;
 import com.codejustice.global.Global;
+import com.codejustice.global.tempProfile;
 import com.codejustice.utils.db.MessagesDBHelper;
 
 import java.util.List;
@@ -319,6 +320,10 @@ public class MessagesFragment extends Fragment implements MessageObserver {
             }
             if (cm instanceof ChatMessage) {
                 ((ChatCell)holder).chatMessage.setText(((ChatMessage)cm).messageContent);
+                if (tempProfile.profile.containsKey(((ChatMessage) cm).senderID)) {
+                    ((ChatCell)holder).profilePic.setImageResource(tempProfile.profile.get(((ChatMessage) cm).senderID));
+                }
+
                 if (((ChatMessage) cm).senderID == Global.selfID) {
                     switch (((ChatMessage) cm).sentStatus) {
                         case ChatMessage.SENT:

@@ -21,6 +21,7 @@ import com.codejustice.entities.FriendEntity;
 import com.codejustice.enums.MessageTypes;
 import com.codejustice.eyeconizefamily.databinding.FragmentPickPatientsBinding;
 import com.codejustice.global.Global;
+import com.codejustice.global.tempProfile;
 import com.codejustice.utils.ChatDateUtils;
 import com.codejustice.utils.db.FriendsDBHelper;
 import com.codejustice.utils.db.MessagesDBHelper;
@@ -180,6 +181,11 @@ public class PickPatientsFragment extends Fragment {
             FriendEntity friendEntity = myFamilyList.get(position);
             holder.name.setText(friendEntity.friendName);
             holder.lastMessage.setText(friendEntity.lastMessage);
+
+            //TODO 修改读取头像代码。目前代码为临时展示用
+            if (tempProfile.profile.containsKey(friendEntity.friendID)) {
+                holder.profilePic.setImageResource(tempProfile.profile.get(friendEntity.friendID));
+            }
             if (friendEntity.lastMessageTime > 0) {
                 holder.lastTime.setText(ChatDateUtils.genTimeString(friendEntity.lastMessageTime));
             }else{
