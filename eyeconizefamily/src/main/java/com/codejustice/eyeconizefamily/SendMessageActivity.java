@@ -11,7 +11,6 @@ import android.text.TextWatcher;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
@@ -22,7 +21,8 @@ import NetService.ConnectionUtils.ChatMessage;
 import com.codejustice.dialogs.AskAvailableDialog;
 import com.codejustice.enums.MessageTypes;
 import com.codejustice.global.Global;
-import com.codejustice.netservice.NetThread;
+import com.codejustice.services.NetThread;
+import com.codejustice.utils.db.FriendsDBHelper;
 import com.codejustice.utils.db.MessagesDBHelper;
 
 import NetService.ConnectionUtils.ConnectionManager;
@@ -35,14 +35,16 @@ public class SendMessageActivity extends AppCompatActivity implements ReplierAct
     private final float MAX_CLICK_DISTANCE = 40;
     private final float MIN_SWIPE_DISTANCE = 50;
     private final float HORIZONTAL_SWIPE_THRESH = 50;
+    private TextView sendTipTextView;
 
     private NetThread netThread;
 
     private MessagesFragment messagesFragment;
     private ConnectionManager connectionManager;
     private ImageButton sendButton;
+    private FriendsDBHelper friendsDBHelper;
+    private boolean buttonActivated;
     private EditText sendContent;
-    public FrameLayout FamilyStatusHead;
     private ImageButton goToMainButton;
     private TextView batteryView;
 
@@ -50,6 +52,7 @@ public class SendMessageActivity extends AppCompatActivity implements ReplierAct
     private TextView deviceStatusView;
     private TextView patientCurrentStatusView;
     private TextView patientLastStatusView;
+    private TextView patientNameView;
     Handler handler;
     private boolean gonnaSendQuestion = false;
 
@@ -73,7 +76,10 @@ public class SendMessageActivity extends AppCompatActivity implements ReplierAct
         batteryView = findViewById(R.id.ChatBattery);
         deviceStatusView = findViewById(R.id.ChatDeviceStatus);
         patientCurrentStatusView = findViewById(R.id.ChatPatientCurrentStatus);
+        sendTipTextView = findViewById(R.id.send_messag_tip_text);
         patientLastStatusView = findViewById(R.id.ChatPatientLastStatus);
+        patientNameView = findViewById(R.id.ChatFamilyName);
+        friendsDBHelper = FriendsDBHelper.getInstance(this);
         goToMainButton.setOnClickListener(v->{
             Intent intent = new Intent(SendMessageActivity.this, MainActivity.class);
             startActivity(intent);
@@ -81,6 +87,7 @@ public class SendMessageActivity extends AppCompatActivity implements ReplierAct
         });
         Global.messageSerial = messagesDBHelper.getLastSerial(Global.receiverID);
         connectionManager.registerPageObserver(this);
+        patientNameView.setText(friendsDBHelper.getFriendNicknameByID(Global.receiverID, Global.selfID));
 
 
         alterButtonStatus(false);
@@ -119,7 +126,7 @@ public class SendMessageActivity extends AppCompatActivity implements ReplierAct
                     case MotionEvent.ACTION_UP:
                         long pressDuration = System.currentTimeMillis() - pressStartTime;
                         float distance = getDistance(pressedX, pressedY, event.getX(), event.getY());
-                        if (pressDuration < MAX_CLICK_DURATION && distance < MAX_CLICK_DISTANCE) {
+                        if (pressDuration < MAX_CLICK_DURATION && distance < MAX_CLICK_DISTANCE && buttonActivated) {
                           //正常点击
                             String message = sendContent.getText().toString();
                             if (gonnaSendQuestion) {
@@ -197,6 +204,26 @@ public class SendMessageActivity extends AppCompatActivity implements ReplierAct
     }
 
     @Override
+    protected void onResume(){
+        super.onResume();
+        ((EyeconizeFamilyApplication)getApplication()).setInForeground(true);
+        connectionManager.registerPageObserver(this);
+
+    }
+
+
+    @Override
+    protected void onPause(){
+        super.onPause();
+        System.out.println("pausing...");
+        ((EyeconizeFamilyApplication)getApplication()).setInForeground(false);
+        connectionManager.unregisterPageObserver(this);
+
+
+    }
+
+
+    @Override
     public void sendMessage(String content, long receiverID) {
         if (!content.trim().equals("")) {
             Global.receiverID = receiverID;
@@ -209,7 +236,7 @@ public class SendMessageActivity extends AppCompatActivity implements ReplierAct
             Global.messageSerial = (short)(Global.messageSerial%10000);
             long sendTime = System.currentTimeMillis();
 
-            messagesFragment.addMessage(new ChatMessage(content, Global.selfID, sendTime, Global.messageSerial, ChatMessage.SENDING));
+            messagesFragment.addMessageAndRenewDatabase(new ChatMessage(content, Global.selfID, sendTime, Global.messageSerial, ChatMessage.SENDING));
 
             new Thread(()->{
                 connectionManager.sendTextMessage(content, receiverID, Global.messageSerial, sendTime);
@@ -229,7 +256,7 @@ public class SendMessageActivity extends AppCompatActivity implements ReplierAct
             Global.messageSerial = (short)(Global.messageSerial%10000);
             long sendTime = System.currentTimeMillis();
 
-            messagesFragment.addMessage(new ChatMessage(content, Global.selfID, sendTime, Global.messageSerial, ChatMessage.SENDING));
+            messagesFragment.addMessageAndRenewDatabase(new ChatMessage(content, Global.selfID, sendTime, Global.messageSerial, ChatMessage.SENDING));
 
             new Thread(()->{
                 connectionManager.sendQuestionMessage(content, receiverID, Global.messageSerial);
@@ -249,10 +276,10 @@ public class SendMessageActivity extends AppCompatActivity implements ReplierAct
     }
 
     private void alterButtonStatus(boolean activated) {
-        sendButton.setEnabled(activated);
+        buttonActivated = activated;
+        sendTipTextView.setText(genTip(gonnaSendQuestion));
         if (gonnaSendQuestion) {
             if (activated) {
-
                 sendButton.setBackgroundResource(R.drawable.send_button_question);
             }else{
                 sendButton.setBackgroundResource(R.drawable.send_button_question_deactivated);
@@ -264,6 +291,15 @@ public class SendMessageActivity extends AppCompatActivity implements ReplierAct
             }else{
                 sendButton.setBackgroundResource(R.drawable.send_button_normal_deactivated);
             }
+        }
+    }
+
+    private String genTip(boolean isQuestion) {
+        String head = "左右滑动按钮切换发送模式。当前模式：";
+        if (isQuestion) {
+            return head + "问题";
+        } else {
+            return head + "普通";
         }
     }
 }

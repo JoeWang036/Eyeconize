@@ -11,5 +11,9 @@
 
         <item name="android:backgroundDimEnabled">true</item>
     </style>
+    <style name="AppTheme.Transparent" parent="Theme.AppCompat.Light">
+        <!-- 添加透明样式的其他属性 -->
+        <item name="android:windowBackground">@android:color/transparent</item>
+    </style>
 
 </resources>

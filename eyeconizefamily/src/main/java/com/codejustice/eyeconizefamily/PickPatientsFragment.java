@@ -2,6 +2,7 @@ package com.codejustice.eyeconizefamily;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.content.pm.FeatureInfo;
 import android.os.Bundle;
 import android.os.Message;
 import android.os.SystemClock;
@@ -20,10 +21,17 @@ import com.codejustice.entities.FriendEntity;
 import com.codejustice.enums.MessageTypes;
 import com.codejustice.eyeconizefamily.databinding.FragmentPickPatientsBinding;
 import com.codejustice.global.Global;
+import com.codejustice.global.tempProfile;
+import com.codejustice.utils.ChatDateUtils;
 import com.codejustice.utils.db.FriendsDBHelper;
+import com.codejustice.utils.db.MessagesDBHelper;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+
+import NetService.ConnectionUtils.ChatMessage;
 
 public class PickPatientsFragment extends Fragment {
 
@@ -35,6 +43,7 @@ public class PickPatientsFragment extends Fragment {
 
     private RecyclerView familyPickerView;
     private FamilyPickerAdapter familyPickerAdapter;
+    private MessagesDBHelper messagesDBHelper;
     private List<FriendEntity> myFamilyList = new ArrayList<>();
     private FragmentPickPatientsBinding binding;
     private FriendsDBHelper friendsDBHelper;
@@ -52,22 +61,79 @@ public class PickPatientsFragment extends Fragment {
         View rootView = binding.getRoot();
 
         friendsDBHelper = FriendsDBHelper.getInstance(requireContext());
+        messagesDBHelper = MessagesDBHelper.getInstance(requireContext());
         // 初始化 RecyclerView
+
         familyPickerView = rootView.findViewById(R.id.pick_family_view);
         familyPickerAdapter = new FamilyPickerAdapter();
         familyPickerView.setAdapter(familyPickerAdapter);
         familyPickerView.setLayoutManager(new LinearLayoutManager(requireContext()));
 
+
         friendsDBHelper.switchTable(Global.selfID);
         // 添加测试数据
-        for (int i = 0; i < 20; i++) {
-            FriendEntity fm = new FriendEntity("家人" + i, "我需要钱", i);
+        for (int i = 0; i < 6; i++) {
+            String name;
+            switch (i) {
+                case 0:
+                    name = "王老五";
+                    break;
+                case 1:
+                    name = "梅迪克";
+                    break;
+                case 2:
+                    name = "爹";
+                    break;
+                case 3:
+                    name = "王德发";
+                    break;
+                case 4:
+                    name = "李马";
+                    break;
+                default:
+                    name = "用户" + i;
+
+            }
+            FriendEntity fm = new FriendEntity(name, "我需要钱", i);
             friendsDBHelper.insertData(fm);
         }
         myFamilyList = friendsDBHelper.getFriends();
-        familyPickerAdapter.notifyDataSetChanged();
+        for (FriendEntity friend :
+                myFamilyList) {
+            ChatMessage latestChatMessage = messagesDBHelper.findNewestMessage(friend.friendID);
+            if (latestChatMessage != null) {
+
+                friend.lastMessage = latestChatMessage.messageContent;
+                friend.lastMessageTime = latestChatMessage.timestamp;
+            }
+        }
+
+        refreshContent();
 
         return rootView;
+    }
+
+
+    public void refreshContent(long familyID){
+        int pos = findFamilyWithID(familyID);
+        if (pos >= 0) {
+            System.out.println("refreshing in process.");
+            ChatMessage latestChatMessage = messagesDBHelper.findNewestMessage(familyID);
+            if (latestChatMessage != null) {
+                myFamilyList.get(pos).lastMessage = latestChatMessage.messageContent;
+                System.out.println(latestChatMessage.messageContent);
+                System.out.println("refreshing: content: "+latestChatMessage.messageContent);
+                myFamilyList.get(pos).lastMessageTime = latestChatMessage.timestamp;
+            }
+        }
+
+        System.out.println("refreshing done.");
+        myFamilyList.sort(null);
+        familyPickerAdapter.notifyDataSetChanged();
+    }
+    public void refreshContent(){
+        myFamilyList.sort(null);
+        familyPickerAdapter.notifyDataSetChanged();
     }
 
 
@@ -75,6 +141,7 @@ public class PickPatientsFragment extends Fragment {
         ImageView profilePic;
         TextView name;
         TextView lastMessage;
+        TextView lastTime;
         View view;
 
         public FamilyCell(@NonNull View itemView) {
@@ -83,7 +150,20 @@ public class PickPatientsFragment extends Fragment {
             name = itemView.findViewById(R.id.family_name);
             lastMessage = itemView.findViewById(R.id.last_message);
             profilePic = itemView.findViewById(R.id.chat_profile_pic);
+            lastTime = itemView.findViewById(R.id.family_cell_message_time_view);
+
         }
+    }
+
+    private int findFamilyWithID(long familyID) {
+        System.out.println("finding..."+familyID);
+
+        for (int i = 0; i < myFamilyList.size(); i++) {
+            if (myFamilyList.get(i).friendID == familyID) {
+                return i;
+            }
+        }
+        return -1;
     }
 
 
@@ -106,6 +186,16 @@ public class PickPatientsFragment extends Fragment {
             FriendEntity friendEntity = myFamilyList.get(position);
             holder.name.setText(friendEntity.friendName);
             holder.lastMessage.setText(friendEntity.lastMessage);
+
+            //TODO 修改读取头像代码。目前代码为临时展示用
+            if (tempProfile.profile.containsKey(friendEntity.friendID)) {
+                holder.profilePic.setImageResource(tempProfile.profile.get(friendEntity.friendID));
+            }
+            if (friendEntity.lastMessageTime > 0) {
+                holder.lastTime.setText(ChatDateUtils.genTimeString(friendEntity.lastMessageTime));
+            }else{
+                holder.lastTime.setText("");
+            }
 
             if (mode == DUAL_MODE) {
                 System.out.println("setting on click listener for pick.");

@@ -12,6 +12,9 @@ public class Global {
     public static short messageSerial = 11;
     public static long receiverID = 2;
     public static boolean SEND_NEW_MESSAGE = false;
+    public static final String userMessageChannelID = "eyeconize_notifications";
+    public static final String userMessageChannelName = "识目";
+    public static final String userMessageChannelDescription = "用于接收病人消息";
 
     public static List<TextMessage> messagesToSend = new ArrayList<>();
 

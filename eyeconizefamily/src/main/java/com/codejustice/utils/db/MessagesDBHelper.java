@@ -76,12 +76,15 @@ public class MessagesDBHelper extends SQLiteOpenHelper {
     }
 
     private void createNewTable(long hostID, long otherID) {
-        SQLiteDatabase db = getWritableDatabase();
+        if (currentDatabase == null || !currentDatabase.isOpen()) {
+            currentDatabase = getWritableDatabase();
+        }
+
 //        String createTableQuery = "DROP TABLE IF EXISTS " + genTableName(hostID, otherID);
-//        db.execSQL(createTableQuery);
+//        currentDatabase.execSQL(createTableQuery);
 
         String createTableQuery = ("CREATE TABLE IF NOT EXISTS " + genTableName(hostID, otherID) + " (id INTEGER, content text, sendTime INTEGER, sentStatus INTEGER, messageSerial INTEGER)");
-        db.execSQL(createTableQuery);
+        currentDatabase.execSQL(createTableQuery);
     }
 
     private String genTableName(long hostID, long otherID) {
@@ -97,7 +100,9 @@ public class MessagesDBHelper extends SQLiteOpenHelper {
 //    }
 public void insertData(ChatMessage msg) {
     ContentValues values = new ContentValues();
-    currentDatabase = getWritableDatabase();
+    if (currentDatabase == null || !currentDatabase.isOpen())  {
+        currentDatabase = getWritableDatabase();
+    }
     if (msg.senderID != Global.selfID && !currentTableName.equals(genTableName(Global.selfID, msg.senderID))) {
         System.out.println(currentTableName);
         System.out.println(genTableName(Global.selfID, msg.senderID));
@@ -132,7 +137,9 @@ public void insertData(ChatMessage msg) {
         short serial = message.messageSerial;
         long senderID = message.senderID;
         long sendTime = message.sendTime;
-        SQLiteDatabase db = getWritableDatabase();
+        if (currentDatabase == null || !currentDatabase.isOpen()) {
+            currentDatabase = getWritableDatabase();
+        }
 
         // 更新目标元组的sentStatus和sendTime字段
         ContentValues values = new ContentValues();
@@ -140,38 +147,40 @@ public void insertData(ChatMessage msg) {
         values.put(TIME_KEY, sendTime);
 
         // 构建子查询，获取TIME_KEY值最大的记录的sendTime
-        String subQuery = "SELECT MAX(" + TIME_KEY + ") FROM " + currentTableName + " WHERE " + SERIAL_KEY + " = ? AND " + ID_KEY + " = ?";
-        String[] subArgs = {String.valueOf(serial), String.valueOf(senderID)};
+        String subQuery = "SELECT MAX(" + TIME_KEY + ") FROM " + currentTableName + " WHERE " + SERIAL_KEY + " = "+serial+" AND " + ID_KEY + " = "+senderID;
 
         // 构建更新条件，只更新TIME_KEY值最大的记录
-        String whereClause = TIME_KEY + " = (" + subQuery + ")";
+        String whereClause = TIME_KEY + " = (" + subQuery + ") AND "+SERIAL_KEY +" = ? AND "+ID_KEY + " = ?";
         String[] whereArgs = {String.valueOf(serial), String.valueOf(senderID)};
 
-        // 执行更新操作
-        int i = db.update(currentTableName, values, whereClause, whereArgs);
-        System.out.println("updating..." + i);
+        currentDatabase.update(currentTableName, values, whereClause, whereArgs);
     }
 
     public void updateSentStatusFail(long receiverID, long sendTime, short messageSerial) {
 //        if (!currentTableName.equals(genTableName(Global.selfID, receiverID))) {
 //            switchTable(Global.selfID, receiverID);
 //        }
-        SQLiteDatabase db = getWritableDatabase();
+        if (currentDatabase == null || !currentDatabase.isOpen()) {
+            currentDatabase = getWritableDatabase();
+        }
         ContentValues val = new ContentValues();
         val.put(SENT_KEY, ChatMessage.FAILED);
 //        String selection = SERIAL_KEY + " = ? AND " + ID_KEY  + " = ? AND " + TIME_KEY + " = ?";
 //        String[] selectionArgs = {String.valueOf(messageSerial), String.valueOf(receiverID), String.valueOf(sendTime)};
 
+
+
         String selection = SERIAL_KEY + " = ? AND " + TIME_KEY + " = ?";
         String[] selectionArgs = {String.valueOf(messageSerial), String.valueOf(sendTime)};
-        int i = db.update(currentTableName, val, selection, selectionArgs);
-        System.out.println("update result:"+i);
+        int i = currentDatabase.update(currentTableName, val, selection, selectionArgs);
     }
     public ChatMessage findUpdatedMessage(ConfirmMessage message) {
         short serial = message.messageSerial;
         long receiverID = message.receiverID;
         long sendTime = message.sendTime;
-        SQLiteDatabase db = getWritableDatabase();
+        if (currentDatabase == null || !currentDatabase.isOpen()) {
+            currentDatabase = getWritableDatabase();
+        }
 
 
         String[] columns = {ID_KEY, CONTENT_KEY, TIME_KEY, SENT_KEY};
@@ -180,7 +189,7 @@ public void insertData(ChatMessage msg) {
 
         String orderBy = TIME_KEY + " DESC"; // 按照sendTime从大到小排序
 
-        Cursor cursor = db.query(currentTableName, columns, selection, selectionArgs, null, null, orderBy);
+        Cursor cursor = currentDatabase.query(currentTableName, columns, selection, selectionArgs, null, null, orderBy);
 
         if (cursor.moveToFirst()) {
             long senderID = cursor.getLong(cursor.getColumnIndexOrThrow(ID_KEY));
@@ -195,12 +204,38 @@ public void insertData(ChatMessage msg) {
             return null;
         }
     }
+    public ChatMessage findNewestMessage(long otherID) {
+
+        SQLiteDatabase db = getWritableDatabase();
+        String tableName = genTableName(Global.selfID, otherID);
+        createNewTable(Global.selfID, otherID);
+
+
+        String[] columns = {ID_KEY, CONTENT_KEY, TIME_KEY, SENT_KEY, SERIAL_KEY};
+
+        String orderBy = TIME_KEY + " DESC"; // 按照sendTime从大到小排序
+
+        Cursor cursor = db.query(tableName, columns, null, null, null, null, orderBy);
+
+        if (cursor.moveToFirst()) {
+            long senderID = cursor.getLong(cursor.getColumnIndexOrThrow(ID_KEY));
+            String content = cursor.getString(cursor.getColumnIndexOrThrow(CONTENT_KEY));
+            long time = cursor.getLong(cursor.getColumnIndexOrThrow(TIME_KEY));
+            byte sentStatus = (byte) cursor.getShort(cursor.getColumnIndexOrThrow(SENT_KEY));
+            short serial = cursor.getShort(cursor.getColumnIndexOrThrow(SERIAL_KEY));
+            ChatMessage updatedMessage = new ChatMessage(content, senderID, time, serial, sentStatus);
+            cursor.close();
+            return updatedMessage;
+        } else {
+            cursor.close();
+            return null;
+        }
+    }
 
     public void switchTable(long hostID, long otherID) {
-        if (currentDatabase != null) {
-            currentDatabase.close();
+        if (currentDatabase == null || !currentDatabase.isOpen())  {
+            currentDatabase = getWritableDatabase();
         }
-        currentDatabase = getWritableDatabase();
         createNewTable(hostID, otherID);
         currentTableName = genTableName(hostID, otherID);
     }
@@ -215,21 +250,16 @@ public void insertData(ChatMessage msg) {
         List<ChatMessageAbstract> result = new ArrayList<>();
         Cursor cursor = getCursor();
         if (cursor.moveToFirst()) {
-            System.out.println("content detected.");
             int i = 1;
             long lastSendTime = 0;
             do {
-                System.out.println("database: getting message no."+i++);
                 long senderID = cursor.getLong(cursor.getColumnIndexOrThrow(ID_KEY));
                 String message = cursor.getString(cursor.getColumnIndexOrThrow(CONTENT_KEY));
                 long sendTime = cursor.getLong(cursor.getColumnIndexOrThrow(TIME_KEY));
                 short messageSerial = cursor.getShort(cursor.getColumnIndexOrThrow(SERIAL_KEY));
                 byte sent = (byte)cursor.getShort(cursor.getColumnIndexOrThrow(SENT_KEY));
-                System.out.println("sent status of"+ sendTime+": "+sent);
-                System.out.println(message);
 
                 ChatMessage cm = new ChatMessage(message, senderID, sendTime, messageSerial, sent);
-                System.out.println(sendTime);
                 if (sendTime - lastSendTime > 30000) {
                     System.out.println("adding...");
                     result.add(new TimeShowingMessage(sendTime));
