@@ -599,7 +599,7 @@ public class PageDecode {
         return 0;
     }
 
-    public int decode4All(int nowPage,int lastPage4Three,boolean isReceive){//4表示去常用，5表示工具，6表示其他,7针对消息页面，表示退出消息页面
+    public int decode4All(int nowPage,int lastPage4Three,boolean isReceive){//4表示去常用，5表示工具，6表示其他,7针对消息页面，表示退出消息页面，8是消息弹窗，9是音频
         if(isReceive){//受到一般消息，执行其对应译码
             return dialogMesDecode();
         }
@@ -673,7 +673,7 @@ public class PageDecode {
                 }
             }, 1000);
             clear();
-            return 0;
+            return 9;
         }
 
         switch(nowPage){

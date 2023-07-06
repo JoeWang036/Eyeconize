@@ -12,6 +12,7 @@ import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.hardware.Camera;
+import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -118,6 +119,9 @@ public class HomePage1 extends AppCompatActivity implements PageObserver {
     private BroadcastReceiver teachingReceiver;
 
     private LocalBroadcastManager teachingManager;
+
+    //音频播放
+    MediaPlayer mediaPlayer;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -225,6 +229,7 @@ public class HomePage1 extends AppCompatActivity implements PageObserver {
                             int index=decoder.parse(enumValue,1,0,isReceive);
                             setTime();
                             changePage(index);
+                            playMedia(index);
                         }
                     };
                     broadcastManager = LocalBroadcastManager.getInstance(HomePage1.this);
@@ -415,6 +420,7 @@ public class HomePage1 extends AppCompatActivity implements PageObserver {
                     int index = decoder.parse(enumValue, 1, 0, isReceive);
                     setTime();
                     changePage(index);
+                    playMedia(index);
                 }
             };
             broadcastManager = LocalBroadcastManager.getInstance(this);
@@ -543,6 +549,8 @@ public class HomePage1 extends AppCompatActivity implements PageObserver {
         }
 
         decoder.unRegis();
+
+        mediaPlayer.release();
     }
 
     @Override
@@ -566,5 +574,17 @@ public class HomePage1 extends AppCompatActivity implements PageObserver {
         connectionManager.unregisterPageObserver(this);
     }
 
-
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mediaPlayer.stop();
+    }
+    private void playMedia(int index){
+         if(index==9)
+         {
+             System.out.println("bofang");
+         mediaPlayer = MediaPlayer.create(this, R.raw.usual);
+         mediaPlayer.start();
+         }
+    }
 }

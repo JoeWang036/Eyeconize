@@ -10,6 +10,7 @@ import android.content.IntentFilter;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.hardware.Camera;
+import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -105,6 +106,9 @@ public class HomePage3 extends AppCompatActivity implements PageObserver {
     boolean isReceive;
 
     Stack<ReceiveMesDialog> dialogs;//消息栈，处理多个消息
+
+    //音频播放
+    MediaPlayer mediaPlayer;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -233,6 +237,7 @@ public class HomePage3 extends AppCompatActivity implements PageObserver {
                 int index=decoder.parse(enumValue,3,totalPages,isReceive);//最后一页是多少需要通过数据计算
                 setTime();
                 changePage(index);
+                playMedia(index);
             }
         };
         broadcastManager = LocalBroadcastManager.getInstance(this);
@@ -414,6 +419,8 @@ public class HomePage3 extends AppCompatActivity implements PageObserver {
         connectionManager.unregisterPageObserver(this);
 
         decoder.unRegis();
+
+        mediaPlayer.release();
     }
 
     @Override
@@ -435,5 +442,19 @@ public class HomePage3 extends AppCompatActivity implements PageObserver {
         super.onDestroy();
         releaseLensEngine();
         connectionManager.unregisterPageObserver(this);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mediaPlayer.stop();
+    }
+    private void playMedia(int index){
+        if(index==9)
+        {
+            System.out.println("bofang");
+            mediaPlayer = MediaPlayer.create(this, R.raw.else_media);
+            mediaPlayer.start();
+        }
     }
 }
