@@ -5,5 +5,7 @@
         <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
     </style>
 
-    <style name="Theme.Eyerecongize" parent="Base.Theme.Eyerecongize" />
+    <style name="Theme.Eyerecongize" parent="Base.Theme.Eyerecongize" >
+        <item name="android:keepScreenOn">true</item>
+    </style>
 </resources>

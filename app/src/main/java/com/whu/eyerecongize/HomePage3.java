@@ -238,7 +238,7 @@ public class HomePage3 extends AppCompatActivity implements PageObserver {
         broadcastManager = LocalBroadcastManager.getInstance(this);
         broadcastManager.registerReceiver(myReceiver, new IntentFilter("code"));
 
-        decoder.unRegis();
+        decoder.Regius();
     }
 
     private void setAnalyzer() {

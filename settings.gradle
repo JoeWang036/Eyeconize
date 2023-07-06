@@ -12,6 +12,9 @@ dependencyResolutionManagement {
         google()
         mavenCentral()
         maven { url 'https://developer.huawei.com/repo/' }
+
+        maven { url 'https://jitpack.io' }
+
     }
 }
 rootProject.name = "eyerecongize"

@@ -7,7 +7,10 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.graphics.Rect;
+import android.graphics.RectF;
 import android.hardware.Camera;
 import android.os.Build;
 import android.os.Bundle;
@@ -23,6 +26,14 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.app.hubert.guide.NewbieGuide;
+import com.app.hubert.guide.core.Controller;
+import com.app.hubert.guide.listener.OnGuideChangedListener;
+import com.app.hubert.guide.listener.OnLayoutInflatedListener;
+import com.app.hubert.guide.listener.OnPageChangedListener;
+import com.app.hubert.guide.model.GuidePage;
+import com.app.hubert.guide.model.HighLight;
+import com.app.hubert.guide.model.RelativeGuide;
 import com.huawei.hms.mlsdk.face.MLFaceAnalyzerSetting;
 import com.whu.eyerecongize.bilnk.BlinkType;
 import com.whu.eyerecongize.bilnk.PageDecode;
@@ -101,11 +112,22 @@ public class HomePage1 extends AppCompatActivity implements PageObserver {
 
     Stack<ReceiveMesDialog>dialogs;//消息栈，处理多个消息
 
+    //教学判定
+    boolean isTeaching;
+
+    private BroadcastReceiver teachingReceiver;
+
+    private LocalBroadcastManager teachingManager;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home_page1);
         setStatusBar();
+        //从内存获取锁值，用以确定是否启动识别引擎，教学用
+        //获取SharedPreferences对象
+        SharedPreferences sharedPreferences = getSharedPreferences("teaching",MODE_PRIVATE);
+        isTeaching = sharedPreferences.getBoolean("isTeaching",false);
+
         //注册通信对象
         netThread = ((EyeconizeApplication)getApplication()).getNetThread();
         connectionManager = ConnectionManager.getInstance();
@@ -190,8 +212,178 @@ public class HomePage1 extends AppCompatActivity implements PageObserver {
         this.setStatusBar();
 
         setTime();
+        //主线程注册一个监听器用来教学时启动引擎
+        if(!isTeaching){
+            teachingReceiver = new BroadcastReceiver() {
+                @Override
+                public void onReceive(Context context, Intent intent) {
+                    myReceiver = new BroadcastReceiver() {
+                        @Override
+                        public void onReceive(Context context, Intent intent) {
+                            BlinkType enumValue = (BlinkType) intent.getSerializableExtra("newCode");
+                            //译码逻辑
+                            int index=decoder.parse(enumValue,1,0,isReceive);
+                            setTime();
+                            changePage(index);
+                        }
+                    };
+                    broadcastManager = LocalBroadcastManager.getInstance(HomePage1.this);
+                    broadcastManager.registerReceiver(myReceiver, new IntentFilter("code"));
+                    decoder.Regius();
+
+                }
+            };
+            teachingManager = LocalBroadcastManager.getInstance(this);
+            teachingManager.registerReceiver(teachingReceiver, new IntentFilter("teach"));
+
+        }
+        initTeaching();
     }
 
+    public void initTeaching(){
+        NewbieGuide.with(HomePage1.this)
+                .setLabel("teaching")
+                .setOnGuideChangedListener(new OnGuideChangedListener() {
+                    @Override
+                    public void onShowed(Controller controller) {
+
+                    }
+
+                    @Override
+                    public void onRemoved(Controller controller) {
+                        System.out.println("sendmes");
+                        //获取SharedPreferences对象
+                        SharedPreferences sharedPreferences = getSharedPreferences("teaching",MODE_PRIVATE);
+                        //获取Editor对象的引用
+                        SharedPreferences.Editor editor = sharedPreferences.edit();
+                        //将获取过来的值放入文件
+                        editor.putBoolean("isTeaching",true);
+                        // 提交数据
+                        editor.apply();
+                        isTeaching=true;
+
+
+
+                    }
+                })
+                .setOnPageChangedListener(new OnPageChangedListener() {
+                    @Override
+                    public void onPageChanged(int page) {
+                        if(page==10){
+                            LocalBroadcastManager broadcastManager = LocalBroadcastManager.getInstance(HomePage1.this);
+                            Intent intent = new Intent("teach");
+                            broadcastManager.sendBroadcast(intent);
+                        }
+                    }
+                })
+                .addGuidePage(//第一页
+                        GuidePage.newInstance()//创建一个实例
+                                .setLayoutRes(R.layout.inst_page)//设置引导页布局
+                                .setOnLayoutInflatedListener(new OnLayoutInflatedListener() {
+                                    @Override
+                                    public void onLayoutInflated(View view, Controller controller) {
+                                        //引导页布局填充后回调，用于初始化
+                                        ImageView ig = view.findViewById(R.id.imageViewInst);
+                                        ig.setImageResource(R.drawable.inst1);
+                                    }
+                                })
+                                .setBackgroundColor(0xd9D7D7D7)
+                )
+                .addGuidePage(//第二页
+                        GuidePage.newInstance()//创建一个实例
+                                .setLayoutRes(R.layout.inst_page)//设置引导页布局
+                                .setOnLayoutInflatedListener(new OnLayoutInflatedListener() {
+                                    @Override
+                                    public void onLayoutInflated(View view, Controller controller) {
+                                        //引导页布局填充后回调，用于初始化
+                                        ImageView ig = view.findViewById(R.id.imageViewInst);
+                                        ig.setImageResource(R.drawable.inst2);
+                                    }
+                                })
+                                .setBackgroundColor(0xd9D7D7D7)
+                )
+                .addGuidePage(
+                        GuidePage.newInstance()
+                            .addHighLight(new RectF(0, 0, 250, 1100), HighLight.Shape.RECTANGLE,20,
+                                    new RelativeGuide(R.layout.inst3_page,
+                                    Gravity.RIGHT, 20))
+                            .setBackgroundColor(0xd9D7D7D7)
+                )
+                .addGuidePage(//第四页
+                        GuidePage.newInstance()//创建一个实例
+                                .setLayoutRes(R.layout.inst_page)//设置引导页布局
+                                .setOnLayoutInflatedListener(new OnLayoutInflatedListener() {
+                                    @Override
+                                    public void onLayoutInflated(View view, Controller controller) {
+                                        //引导页布局填充后回调，用于初始化
+                                        ImageView ig = view.findViewById(R.id.imageViewInst);
+                                        ig.setImageResource(R.drawable.inst4);
+                                    }
+                                })
+                                .setBackgroundColor(0xd9D7D7D7)
+                )
+                .addGuidePage(//第五页
+                        GuidePage.newInstance()
+                                .addHighLight(new RectF(250, 0, 1350, 1100), HighLight.Shape.RECTANGLE,20,
+                                        new RelativeGuide(R.layout.inst5_page,
+                                                Gravity.RIGHT, 20))
+                                .setBackgroundColor(0xd9D7D7D7)
+                )
+                .addGuidePage(//第六页
+                        GuidePage.newInstance()//创建一个实例
+                                .setLayoutRes(R.layout.inst_page)//设置引导页布局
+                                .setOnLayoutInflatedListener(new OnLayoutInflatedListener() {
+                                    @Override
+                                    public void onLayoutInflated(View view, Controller controller) {
+                                        //引导页布局填充后回调，用于初始化
+                                        ImageView ig = view.findViewById(R.id.imageViewInst);
+                                        ig.setImageResource(R.drawable.inst6);
+                                    }
+                                })
+                                .setBackgroundColor(0xd9D7D7D7)
+                )
+                .addGuidePage(//第七页
+                        GuidePage.newInstance()//创建一个实例
+                                .setLayoutRes(R.layout.inst_page)//设置引导页布局
+                                .setOnLayoutInflatedListener(new OnLayoutInflatedListener() {
+                                    @Override
+                                    public void onLayoutInflated(View view, Controller controller) {
+                                        //引导页布局填充后回调，用于初始化
+                                        ImageView ig = view.findViewById(R.id.imageViewInst);
+                                        ig.setImageResource(R.drawable.inst7);
+                                    }
+                                })
+                                .setBackgroundColor(0xd9D7D7D7)
+                )
+                .addGuidePage(//第八页
+                        GuidePage.newInstance()
+                                .addHighLight(new RectF(0, 280, 250, 350), HighLight.Shape.RECTANGLE,20,
+                                        new RelativeGuide(R.layout.inst8_page,
+                                                Gravity.RIGHT, 20))
+                                .setBackgroundColor(0xd9D7D7D7)
+                )
+                .addGuidePage(//第九页
+                        GuidePage.newInstance()
+                                .addHighLight(new RectF(1350, 80, 2050, 800), HighLight.Shape.RECTANGLE,20,
+                                        new RelativeGuide(R.layout.inst9_page,
+                                                Gravity.LEFT, 0))
+                                .setBackgroundColor(0xd9D7D7D7)
+                )
+                .addGuidePage(//第十页
+                        GuidePage.newInstance()
+                                .addHighLight(new RectF(1350, 800, 2050, 1000), HighLight.Shape.RECTANGLE,20)
+                                .setLayoutRes(R.layout.inst10_page)
+                                .setBackgroundColor(0xd9D7D7D7)
+                )
+                .addGuidePage(//第十一页
+                        GuidePage.newInstance()
+                                .addHighLight(new RectF(1350, 80, 2050, 1000), HighLight.Shape.RECTANGLE,20)
+                                .setLayoutRes(R.layout.inst11_page)
+                                .setBackgroundColor(0xd9D7D7D7)
+                )
+                .show();
+
+    }
 
     @Override
     public void newMessageAlert(ChatMessage chatMessage) {
@@ -214,19 +406,21 @@ public class HomePage1 extends AppCompatActivity implements PageObserver {
     @Override
     protected void onStart() {
         super.onStart();
-        myReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                BlinkType enumValue = (BlinkType) intent.getSerializableExtra("newCode");
-                //译码逻辑
-                int index=decoder.parse(enumValue,1,0,isReceive);
-                setTime();
-                changePage(index);
-            }
-        };
-        broadcastManager = LocalBroadcastManager.getInstance(this);
-        broadcastManager.registerReceiver(myReceiver, new IntentFilter("code"));
-        decoder.Regius();
+        if(isTeaching) {
+            myReceiver = new BroadcastReceiver() {
+                @Override
+                public void onReceive(Context context, Intent intent) {
+                    BlinkType enumValue = (BlinkType) intent.getSerializableExtra("newCode");
+                    //译码逻辑
+                    int index = decoder.parse(enumValue, 1, 0, isReceive);
+                    setTime();
+                    changePage(index);
+                }
+            };
+            broadcastManager = LocalBroadcastManager.getInstance(this);
+            broadcastManager.registerReceiver(myReceiver, new IntentFilter("code"));
+            decoder.Regius();
+        }
     }
 
     private void setAnalyzer() {
@@ -331,6 +525,7 @@ public class HomePage1 extends AppCompatActivity implements PageObserver {
     @Override
     public void onResume() {
         super.onResume();
+
         this.startLensEngine();
         connectionManager.registerPageObserver(this);
     }
@@ -342,6 +537,10 @@ public class HomePage1 extends AppCompatActivity implements PageObserver {
         broadcastManager.unregisterReceiver(myReceiver);
 
         connectionManager.unregisterPageObserver(this);
+
+        if(teachingManager!=null){
+            teachingManager.unregisterReceiver(teachingReceiver);
+        }
 
         decoder.unRegis();
     }
@@ -366,4 +565,6 @@ public class HomePage1 extends AppCompatActivity implements PageObserver {
         releaseLensEngine();
         connectionManager.unregisterPageObserver(this);
     }
+
+
 }
