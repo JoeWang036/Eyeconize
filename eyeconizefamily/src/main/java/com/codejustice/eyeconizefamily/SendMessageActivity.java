@@ -210,7 +210,7 @@ public class SendMessageActivity extends AppCompatActivity implements ReplierAct
     public void initTeaching(){
         NewbieGuide.with(SendMessageActivity.this)
                 .setLabel("teachMessage")
-                .alwaysShow(true)//总是显示，调试时可以打开
+                //.alwaysShow(true)//总是显示，调试时可以打开
                 .setOnGuideChangedListener(new OnGuideChangedListener() {
                     @Override
                     public void onShowed(Controller controller) {

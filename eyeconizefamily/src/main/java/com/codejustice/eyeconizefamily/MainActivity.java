@@ -134,7 +134,7 @@ public class MainActivity extends AppCompatActivity implements PageObserver, Rep
     public void initTeaching(){
         NewbieGuide.with(MainActivity.this)
                 .setLabel("teach")
-                .alwaysShow(true)//总是显示，调试时可以打开
+                //.alwaysShow(true)//总是显示，调试时可以打开
                 .setOnGuideChangedListener(new OnGuideChangedListener() {
                     @Override
                     public void onShowed(Controller controller) {
