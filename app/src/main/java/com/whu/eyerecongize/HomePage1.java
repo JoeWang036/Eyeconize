@@ -549,8 +549,8 @@ public class HomePage1 extends AppCompatActivity implements PageObserver {
         }
 
         decoder.unRegis();
-
-        mediaPlayer.release();
+        if(mediaPlayer!=null){
+        mediaPlayer.release();}
     }
 
     @Override
@@ -577,7 +577,9 @@ public class HomePage1 extends AppCompatActivity implements PageObserver {
     @Override
     protected void onPause() {
         super.onPause();
+        if(mediaPlayer!=null){
         mediaPlayer.stop();
+        }
     }
     private void playMedia(int index){
          if(index==9)
